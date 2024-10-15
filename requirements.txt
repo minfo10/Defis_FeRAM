@@ -3,3 +3,6 @@ pyvisa-py
 pyvisa
 matplotlib
 tkinter
+get-pip
+pyserial
+numpy
