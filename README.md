@@ -1,4 +1,5 @@
 # Défis d'IPhy - Mémoires du futur
+
 ## Sommaire
 
 - [Arduino](#Arduino)
@@ -6,6 +7,31 @@
 - [Export_arduino_data](#Export_arduino_data)
 
 - [Probe Station GUI](#Probe_Station_GUI)
+
+## Pré-requis
+
+- **Python 3.x**
+- **PyQt5** : Pour la création de l'interface graphique.
+- **Matplotlib** : Pour la visualisation et le tracé des données.
+- **Numpy** : Pour la gestion des données numériques.
+- **PySerial** : Pour la communication avec la station de sondage via des interfaces série.
+- **tkinter** : 
+- **get-pip** : 
+- **zeroconf** : 
+- **pyvisa** : 
+
+
+## Installation
+
+1. Cloner le dépôt :
+   ```bash
+   git clone https://github.com/minfo10/Defis_FeRAM.git
+   ```
+
+2. Installer les dépendances requises :
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ## Arduino
 
@@ -84,22 +110,6 @@ Ce dossier contient deux programmes python :
 
 Le programme memory.py est le code principal avec lequel nous allons travailler. Le but de ce programme est d'écrire les données du terminal Arduino dans un fichier .txt
 
-Ce programme utilise cependant la librarie serial, il faudra donc l'importer et installer au préalable get-pip.py.
-Il faudra ensuite ouvrir le terminal, se rendre dans le dossier ou est get-pip.py, et installer pyserial :
-
-    ```bash
-    pip install pyserial
-    ```
-    
-Sur Windows 11, il sera peut être nécessaire d'ajouter python3 :
-
-    ```bash
-    pythin3 pip install pyserial 
-    ```
-
-Votre programme sera ensuite prêt à être utilisé, penser bien à vérifier le port sur lequel votre Arduino est branchée, et vous voilà avec une interface de communication simple entre votre Arduino et python. 
-
-
 ---
 
 ## Probe_Station_GUI
@@ -123,30 +133,6 @@ Ce dépôt contient une interface graphique (GUI) conçue pour contrôler et col
 - `work_to_do/` : Contient des scripts en cours, tels que `transistor.py` et des fichiers icônes comme `icon_transistor.png`.
 - `Manuel_programmation_Keysight.pdf` : Un manuel de programmation pour le matériel Keysight utilisé dans le projet.
 
-### Pré-requis
-
-- **Python 3.x**
-- **PyQt5** : Pour la création de l'interface graphique.
-- **Matplotlib** : Pour la visualisation et le tracé des données.
-- **Numpy** : Pour la gestion des données numériques.
-- **PySerial** : Pour la communication avec la station de sondage via des interfaces série.
-
-### Installation
-
-1. Cloner le dépôt :
-   ```bash
-   git clone https://github.com/minfo10/Defis_FeRAM.git
-   ```
-
-2. Naviguer vers le répertoire du Probe Station GUI :
-   ```bash
-   cd Defis_FeRAM/Probe_Station_GUI-main
-   ```
-
-3. Installer les dépendances requises :
-   ```bash
-   pip install -r requirements.txt
-   ```
 
 ### Utilisation
 
