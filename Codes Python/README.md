@@ -3,7 +3,8 @@
 
 Ce dossier contient deux programmes python :
 - memory.py
-- get-pip.py 
+- get-pip.py
+
 Le programme memory.py est le code principal avec lequel nous allons travailler. Le but de ce programme est d'écrire les données du terminal Arduino dans un fichier .txt
 
 Ce programme utilise cependant la librarie serial, il faudra donc l'importer et installer au préalable get-pip.py.
