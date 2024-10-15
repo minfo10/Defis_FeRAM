@@ -1,5 +1,5 @@
 # Défis d'IPhy - Mémoires du futur
-## Somamaire
+## Sommaire
 
 - [Arduino](##Arduino)
 
