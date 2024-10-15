@@ -1,11 +1,11 @@
 # Défis d'IPhy - Mémoires du futur
-## Soma+maire
+## Somamaire
 
 - [Arduino](##Arduino)
 
-- [Export_arduino_data](##Export_arduino_data) pour plus de détails.
+- [Export_arduino_data](##Export_arduino_data)
 
-- [Probe Station GUI](##Probe Station GUI) pour plus de détails.
+- [Probe Station GUI](##Probe_Station_GUI)
 
 ## Arduino
 
@@ -102,7 +102,7 @@ Votre programme sera ensuite prêt à être utilisé, penser bien à vérifier l
 
 ---
 
-## Probe Station GUI
+## Probe_Station_GUI
 
 Ce dépôt contient une interface graphique (GUI) conçue pour contrôler et collecter des données d'une station de sondage, spécifiquement pour la caractérisation des dispositifs FeRAM (Mémoire vive ferroélectrique). La GUI permet aux utilisateurs d'automatiser les séquences de sondage, de visualiser les données en temps réel et d'exporter les résultats pour des analyses supplémentaires.
 
