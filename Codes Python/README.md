@@ -11,6 +11,8 @@ Ce programme utilise cependant la librarie serial, il faudra donc l'importer et 
 Il faudra ensuite ouvrir le terminal, se rendre dans le dossier ou est get-pip.py, et installer pyserial :
 ```
 C:\Users\User>pip install pyserial
+C:\Users\User>pip install pyvisa-py
+C:\Users\User>pip install zeroconf
 ```
 Sur Windows 11, il sera peut être nécessaire d'ajouter python3 :
 ```
