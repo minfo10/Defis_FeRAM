@@ -1,0 +1,5 @@
+zeroconf
+pyvisa-py
+pyvisa
+matplotlib
+tkinter
