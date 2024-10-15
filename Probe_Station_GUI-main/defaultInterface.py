@@ -8,6 +8,7 @@ Created on Tue Mar 30 15:55:46 2021
 import os
 import tkinter as tk
 from tkinter import ttk
+import webbrowser
 import matplotlib.pyplot as plt
 from FenTracer import Reglage, FenTracerVar
 import ExportData
@@ -51,7 +52,7 @@ class AppWindow(tk.Tk):
         menuCarac.add_command(label='Ionisation par impact (soon)')
         menuHelp = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label='Help', menu=menuHelp)
-        menuHelp.add_command(label='GitHub') 
+        menuHelp.add_command(label='GitHub', command=webbrowser.open("https://github.com/minfo10/Defis_FeRAM")) 
         menuHelp.add_command(label='Crédit') 
         
         # Channel 1 
@@ -236,7 +237,7 @@ class AppWindow(tk.Tk):
             exportWindow.mainloop()
         else:
             tk.messagebox.showerror(title='Error', message="Aucune mesure n'a été réaliser")
-        
+
     def close(self):
         self.destroy()
     
