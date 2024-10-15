@@ -48,7 +48,7 @@ void loop() {
 		else if(sRead == 2){
 			int lect = PORTB;
 				if((lect & SC_OUTport) == SC_OUTport){
-					Serial.write("Wooooo");
+					Serial.write("Woooo");
 					checkDebug == 1;
 			}
 		}
