@@ -43,6 +43,8 @@ Ce dépôt contient une interface graphique (GUI) conçue pour contrôler et col
 3. Installer les dépendances requises :
    ```bash
    pip install -r requirements.txt
+   pip install pyvisa-py
+   pip install zeroconf
    ```
 
 ### Utilisation
