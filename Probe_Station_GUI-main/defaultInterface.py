@@ -52,7 +52,7 @@ class AppWindow(tk.Tk):
         menuCarac.add_command(label='Ionisation par impact (soon)')
         menuHelp = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label='Help', menu=menuHelp)
-        menuHelp.add_command(label='GitHub', command=webbrowser.open("https://github.com/minfo10/Defis_FeRAM")) 
+        menuHelp.add_command(label='GitHub', command=self.open_github)
         menuHelp.add_command(label='Crédit') 
         
         # Channel 1 
@@ -237,6 +237,10 @@ class AppWindow(tk.Tk):
             exportWindow.mainloop()
         else:
             tk.messagebox.showerror(title='Error', message="Aucune mesure n'a été réaliser")
+
+    def open_github(self):
+    # Ouvre le lien GitHub dans le navigateur par défaut
+        webbrowser.open("https://github.com/minfo10/Defis_FeRAM")
 
     def close(self):
         self.destroy()
