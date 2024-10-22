@@ -43,7 +43,7 @@ void loop() {
 			clk();
 			clk();
 			clk();
-			checkDebug == 0; // Rentre directement dans le switch
+			checkDebug = 0; // Rentre directement dans le switch
 			sRead = 2;}
 		else if(sRead == 2){
 			int lect = PORTB;

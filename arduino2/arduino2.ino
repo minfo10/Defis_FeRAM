@@ -34,7 +34,7 @@ void loop(){
 		}
 		
 	} else {
-		check == 0;
+		check = 0;
 	}
 
 }
