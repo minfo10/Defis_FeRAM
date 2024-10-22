@@ -37,7 +37,7 @@ void loop() {
 			// Mode débuggage.
 		}
 		sRead = Serial.read();
-		checkDebug == 0;
+		checkDebug = 0;
 	} else {
 		if (sRead == 1) {
 			clk();
@@ -49,7 +49,7 @@ void loop() {
 			int lect = PORTB;
 				if((lect & SC_OUTport) == SC_OUTport){
 					Serial.write("Wooooo");
-					checkDebug == 1;
+					checkDebug = 1;
 			}
 		}
 		}
