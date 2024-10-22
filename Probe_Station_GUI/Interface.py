@@ -8,10 +8,7 @@ Created on Tue Mar 30 15:55:46 2021
 import os
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox as mb
 import webbrowser
-import matplotlib.pyplot as plt
-from FenTracer import Reglage, FenTracerVar
 import Importation
 import Exportation
 
@@ -19,12 +16,12 @@ class AppWindow(tk.Tk):
     def __init__(self, inst):
         
         self.inst = inst
-        self.FenVar = None
         
         # Initialisation de l'interface
         tk.Tk.__init__(self)
         self.title('Défi FeRAM') # Titre
         self.iconbitmap(os.getcwd() + '\icon.ico') # Icon de l'app
+        self.geometry('600x300')
         
         # Couleur et background
         self.configure(background='light gray')
@@ -45,12 +42,13 @@ class AppWindow(tk.Tk):
         self.config(menu=menuBar)
 
         menuData = tk.Menu(menuBar, tearoff=0)
-        menuBar.add_cascade(label='Données', menu=menuData)
+        menuBar.add_cascade(label='Data', menu=menuData)
         menuData.add_command(label="Exporter en .txt", command=self.exportation)
         menuData.add_command(label="Importer en .txt", command=self.importation)
 
         menuReset = tk.Menu(menuBar, tearoff=0) 
-        menuBar.add_cascade(label='Reset', menu=menuReset) 
+        menuBar.add_cascade(label='Arduino', menu=menuReset)
+        menuData.add_command(label="Reset")
 
         menuHelp = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label='Help', menu=menuHelp)
@@ -101,20 +99,12 @@ class AppWindow(tk.Tk):
 
     # Différentes fonctions
     def exportation(self):
-        
-        if self.FenVar != None:
-            exportWindow = Exportation.exportInterface(self.FenVar)
+            exportWindow = Exportation.ExportInterface()
             exportWindow.mainloop()
-        else:
-            mb.showerror(title='Error', message="Echec de l'exportation")
 
     def importation(self):
-        
-        if self.FenVar != None:
-            exportWindow = Importation.importInterface(self.FenVar)
+            exportWindow = Importation.ImportInterface()
             exportWindow.mainloop()
-        else:
-            mb.showerror(title='Error', message="Echec de l'importation")
 
     def open_github(self):
     # Ouvre le lien GitHub dans le navigateur par défaut

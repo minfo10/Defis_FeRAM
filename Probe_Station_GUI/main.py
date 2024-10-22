@@ -2,10 +2,10 @@
 # MAIN PROGRAMME #
 ##################
 
-import defaultInterface
+import Probe_Station_GUI.Interface as Interface
 
 test_instance = 'Test Mode'  # or any object/instance that AppWindow can handle
 
 # Directly launch the measurement interface
-main = defaultInterface.AppWindow(inst=test_instance)
+main = Interface.AppWindow(inst=test_instance)
 main.mainloop()
