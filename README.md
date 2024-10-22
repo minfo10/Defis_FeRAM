@@ -4,21 +4,22 @@
 
 - [Arduino](#Arduino)
 
-- [Export_arduino_data](#Export_arduino_data)
-
-- [Probe Station GUI](#Probe_Station_GUI)
+- [Interface utilisateur](user_interface)
 
 ## Pré-requis
 
-- **Python 3.x**
-- **PyQt5** : Pour la création de l'interface graphique.
-- **Matplotlib** : Pour la visualisation et le tracé des données.
-- **Numpy** : Pour la gestion des données numériques.
-- **PySerial** : Pour la communication avec la station de sondage via des interfaces série.
-- **tkinter** : 
-- **get-pip** : 
-- **zeroconf** : 
-- **pyvisa** : 
+Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur votre machine :
+
+- **Python 3.x** : Assurez-vous d'avoir une version récente de Python. Vous pouvez le télécharger depuis [python.org](https://www.python.org/downloads/).
+- **get-pip** : Utilisez `get-pip.py` pour installer `pip`, le gestionnaire de packages Python.
+
+Nous allons utiliser ces librairies :
+- **PyQt5** : Bibliothèque pour la création d'interfaces graphiques.
+- **Numpy** : Pour le calcul numérique et la gestion de tableaux.
+- **PySerial** : Pour la communication série avec des appareils.
+- **tkinter** : Bibliothèque standard pour créer des interfaces graphiques.
+- **zeroconf** : Pour la découverte automatique de services sur un réseau local. 
+- **pyvisa** : Pour contrôler des instruments de mesure via des interfaces VISA.
 
 
 ## Installation
@@ -102,17 +103,7 @@ Ainsi, pour lire ou écrire l'état d'un pin, le programe appelle les fonctions 
 
 ---
 
-## Export_arduino_data
-
-Ce dossier contient deux programmes python :
-- memory.py
-- get-pip.py
-
-Le programme memory.py est le code principal avec lequel nous allons travailler. Le but de ce programme est d'écrire les données du terminal Arduino dans un fichier .txt
-
----
-
-## Probe_Station_GUI
+## user_interface
 
 Ce dépôt contient une interface graphique (GUI) conçue pour contrôler et collecter des données d'une station de sondage, spécifiquement pour la caractérisation des dispositifs FeRAM (Mémoire vive ferroélectrique). La GUI permet aux utilisateurs d'automatiser les séquences de sondage, de visualiser les données en temps réel et d'exporter les résultats pour des analyses supplémentaires.
 
