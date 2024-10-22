@@ -11,7 +11,7 @@ baudrate = 9600
 ser = serial.Serial(port, baudrate)
 
 # Crée un fichier texte pour enregistrer les données
-with open("donnees_arduino.txt", "w") as fichier:
+with open("Data\donnees_arduino.txt", "w") as fichier:
     while True:
         try:
             # Lecture des données depuis le port série
