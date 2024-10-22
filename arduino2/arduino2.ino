@@ -4,7 +4,6 @@
 // https://docs.arduino.cc/hacking/software/PortManipulation
 
 // OBJECTIF : Répondre un front montant après 3 impulsions de clk reçues.
-
 #define pON(port, pin) (port |= bit(pin)) // port OR bit(pin) -> changement que sur pin souhaitÃ©.
 #define pOFF(port, pin) (port &= ~ bit(pin)) // port AND NOT bit(pin)
 
@@ -29,7 +28,7 @@ void loop(){
 			if(cpt == 3){
 				pON(PORTD, OUT);
 				delay(3);
-				pOFF(PORTD, OFF);
+				pOFF(PORTD, OUT);
 				cpt = 0;
 			}
 		}
