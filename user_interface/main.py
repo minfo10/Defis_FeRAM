@@ -2,7 +2,7 @@
 # MAIN PROGRAMME #
 ##################
 
-import Probe_Station_GUI.Interface as Interface
+import Interface
 
 test_instance = 'Test Mode'  # or any object/instance that AppWindow can handle
 
