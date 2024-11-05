@@ -26,7 +26,7 @@ void clk(){
 	// uniquement quand elle reçoit un front montant sur le pin CLOCK.
 	// Le rapport cyclique du signal créneau envoyé n'a donc aucune importance.
 	pON(PORTD, CLOCK);
-	delayMicroseconds(1);
+	delayMicroseconds(2);
 	pOFF(PORTD, CLOCK);
 }
 
