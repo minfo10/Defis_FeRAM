@@ -85,7 +85,7 @@ class AppWindow(tk.Tk):
         Label_write = tk.Label(self, text='Texte à écrire:')
         Label_write.grid(row=6, column=1)
 
-        self.write = tk.StringVar(self,'6')
+        self.write = tk.StringVar(self,'12')
         Entry = tk.Entry(self, textvariable=self.write, justify='center', width=20)
         Entry.grid(row=6, column=2)
         
@@ -110,7 +110,7 @@ class AppWindow(tk.Tk):
         separator3.grid(row=11, column=1, columnspan=8, pady=12, sticky='ew')
         
         # Bouton de lancement de lecture / écriture
-        Button_write = tk.Button(self, text='Envoyer', bg='light blue', width=8)
+        Button_write = tk.Button(self, text='Envoyer', bg='light blue', width=8, command=self.send_data)
         Button_write.grid(row=12, column=2)
         Button_read = tk.Button(self, text='Recevoir', bg='light green', width=8, command=self.update_text_loop)
         Button_read.grid(row=12, column=6)            
@@ -118,7 +118,7 @@ class AppWindow(tk.Tk):
 
     # Différentes fonctions
     def exportation(self):
-            exportWindow = Exportation.ExportInterface()
+            exportWindow = Exportation.ExportInterface()    
             exportWindow.mainloop()
 
     def importation(self):
@@ -131,6 +131,7 @@ class AppWindow(tk.Tk):
 
     def close(self):
         self.destroy()
+
 
     def update_text_loop(self):
 
@@ -168,3 +169,29 @@ class AppWindow(tk.Tk):
             # Ferme le port série après la lecture
             if 'ser' in locals() and ser.is_open:
                 ser.close()
+
+
+
+    def send_data(self):
+        
+        port = self.port_com.get()  # Obtient le port de self.port_com
+        baud = int(self.baud_rate.get())  # Convertit le baud rate en entier
+
+        # Nombre à envoyer
+        number_to_send = int(self.write.get())
+
+        try:
+            # Ouvre le port série
+            ser = serial.Serial(port, baud)
+            time.sleep(2)  # Attendre que la connexion s'établisse
+
+            # Envoyer le nombre à l'Arduino
+            ser.write(f"{number_to_send}\n".encode())  # Encode en bytes et envoie
+        
+        except serial.SerialException as e:
+            print(f"{e}")
+        except ValueError:
+            print("Veuillez entrer un nombre valide.")
+        finally:
+            # Fermer le port série
+            ser.close()
