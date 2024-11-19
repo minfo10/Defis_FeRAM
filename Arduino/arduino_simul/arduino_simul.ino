@@ -12,25 +12,19 @@
 #define SA_PIN 12
 #define SC_IN_PIN 13
 
-// Function to simulate receiving a clock pulse
 void waitForClk() {
-  // Wait for a rising edge on CLOCK_PIN
   while (digitalRead(CLOCK_PIN) == LOW) {
     // Wait for clock to go HIGH
   }
   delayMicroseconds(2);
   while (digitalRead(CLOCK_PIN) == HIGH) {
-    // Wait for clock to go LOW
   }
 }
 
-// Function to simulate selecting a scan chain (impulse for the matrix)
 void selectScanChain() {
-  // This function simulates selecting the correct scan chain based on input signals
   bool sc_sel_zero = digitalRead(SC_SEL_ZERO_PIN);
   bool sc_sel_un = digitalRead(SC_SEL_UN_PIN);
 
-  // Check if SC_SEL_ZERO and SC_SEL_UN are set correctly
   if (sc_sel_zero && !sc_sel_un) {
     for (int i = 0; i < 128; i++) {
       bool sc_in = digitalRead(SC_IN_PIN);
@@ -39,6 +33,15 @@ void selectScanChain() {
         Serial.println(i);
       }
       waitForClk();
+    }
+    Serial.println("Scan chain selection successful.");
+  } else {
+    // If the selection signals are incorrect
+    if (!sc_sel_zero) {
+      Serial.println("Error: SC_SEL_ZERO is not set correctly.");
+    }
+    if (sc_sel_un) {
+      Serial.println("Error: SC_SEL_UN should be LOW but it is HIGH.");
     }
   }
 }
