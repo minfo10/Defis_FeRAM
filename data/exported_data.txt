@@ -1,1 +1,1 @@
-test
+FeRAM Controller Setup Completed
