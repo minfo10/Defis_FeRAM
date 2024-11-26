@@ -3,8 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import webbrowser
-import Importation
-import Exportation
+import ImportExport
 import time
 import serial
 import serial.tools.list_ports
@@ -149,7 +148,7 @@ class Interface(tk.Tk):
             exportWindow.mainloop()
 
     def importation(self):
-            exportWindow = Importation.ImportInterface()
+            exportWindow = ImportExport.ImportInterface()
             exportWindow.mainloop()
 
     def open_github(self):
