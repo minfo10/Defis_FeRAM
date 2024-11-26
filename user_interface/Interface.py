@@ -55,10 +55,6 @@ class Interface(tk.Tk):
         menuBar.add_cascade(label='Help', menu=menuHelp)
         menuHelp.add_command(label='GitHub', command=self.open_github)
 
-    def reset(self):
-        # Placeholder pour la méthode Reset
-        print("Reset triggered")  # Action temporaire
-
     def connection_section(self):
         # Cadre principal pour la connexion et informations
         frame_connexion = ttk.LabelFrame(self, text="Information de connexion", padding=(10, 10))
@@ -160,9 +156,6 @@ class Interface(tk.Tk):
     # Ouvre le lien GitHub dans le navigateur par défaut
         webbrowser.open("https://github.com/minfo10/Defis_FeRAM")
 
-    def close(self):
-        self.destroy()
-
     def check_connection(self):
         port = self.port_com.get()
         baud = int(self.baud_rate.get())
@@ -176,6 +169,15 @@ class Interface(tk.Tk):
             self.connection_status.set("Non connecté")
             self.style.configure("Voyant.TLabel", background="red")  # Change voyant to red
             print(f"Erreur de connexion: {e}")
+            
+    def reset(self):
+        # Placeholder pour la méthode Reset
+        print("Reset triggered")  # Action temporaire
+
+    def close(self):
+        self.destroy()
+
+    
 
 # Fonction pour recevoir les données depuis l'arduino de controle
     def receive_data(self):
