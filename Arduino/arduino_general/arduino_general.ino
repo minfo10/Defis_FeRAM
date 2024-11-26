@@ -204,12 +204,13 @@ void lectCellule(int ligne, int writeBack) {
 
 int lecture(int ligne, int colonne){
 	int lu = 0;
-		for(int i = 0; i < 8; i++){
-		lectCellule(ligne, (colonne - 1) * 8);
-		if(lect(PINB, SC_OUT) != 0){
-			lu += pow(2, i);
-		}
-	}
+		for (int i = 0; i < 8; i++) {
+    lectCellule(ligne, 1);  // Utilisation de `1` pour activer le write-back après lecture
+    if (lect(PINB, SC_OUT) != 0) {
+        lu += pow(2, i);
+    }
+}
+
 	return lu;
 }
 
