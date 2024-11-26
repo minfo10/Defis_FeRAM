@@ -1,13 +1,14 @@
 #include <math.h> // Utile pour isNaN
 
 // Manipulation directe des ports
-#define pON(port, pin) (port |= bit(pin)) // port OR bit(pin) - Passage à l'état HAUT
-#define pOFF(port, pin) (port &= ~ bit(pin)) // port AND NOT bit(pin) - Passage à l'état BAS
-#define lect(port, pin) (port &= bit(pin)) // port AND bit(pin) - Lecture
+#define pON(port, pin) (port |= bit(pin)) // Passage à l'état HAUT
+#define pOFF(port, pin) (port &= ~ bit(pin)) // Passage à l'état BAS
+#define lect(port, pin) ((port) & bit(pin)) // Lecture sans modifier le port
 
 // Pins à brancher.
-const int WB = 0;
-const int SA = 1;
+const int WB = A0; // Remplace la broche 0
+const int SA = A1; // Remplace la broche 1
+
 const int SL = 2;
 const int WL = 3;
 const int PRE = 4;
@@ -26,29 +27,32 @@ void clk(){
 	// uniquement quand elle reçoit un front montant sur le pin CLOCK.
 	// Le rapport cyclique du signal créneau envoyé n'a donc aucune importance.
 	pON(PORTD, CLOCK);
-	delayMicroseconds(1);
+	delayMicroseconds(2);
 	pOFF(PORTD, CLOCK);
 }
 
-void scWLSL(int ligne){
-	// Permet la sélection de la ligne sur laquelle les opérations de lecture et d'écriture vont être effectuées.
+void scWLSL(int ligne) {
+    Serial.print("Sélection de la ligne : ");
+    Serial.println(ligne);
 
-	// Amélioration possible : usage tableaux dynamiques entrée utilisateur pour selection plusieurs lignes
-	// (et donc stockage potentiel de nombres codés sur + que 128 bits)
+    pON(PORTB, SC_SEL_ZERO);
+    pOFF(PORTB, SC_SEL_UN);
 
-	// Sélection de la bonne Scan Chain (cf 4.4.2.1 de la thèse de Mr Francois)
-	pON(PORTB, SC_SEL_ZERO);
-	pOFF(PORTB, SC_SEL_UN);
-
-
-	for(int i = 0; i < 128; i++){
-		if(i == ligne){ // Si la i-ième ligne est la ligne choisie
-			pON(PORTB, SC_IN);
-			clk();
-			pOFF(PORTB, SC_IN);
-		} else clk();
-	}
+    for (int i = 0; i < 128; i++) {
+        if (i == ligne) {
+            Serial.print("Sélection de la ligne dans la chaîne de scan : ");
+            Serial.println(i);
+            pON(PORTB, SC_IN);
+            clk();
+            clk();
+            clk();
+            pOFF(PORTB, SC_IN);
+        } else {
+            clk();
+        }
+    }
 }
+
 
 int scOut(){
 	// Permet de lire la valeur stockée dans la ligne préalablement choisie par l'appel de la fonction scWLSL.
@@ -148,57 +152,65 @@ void unPara(int ligne){
 	clk();
 }
 
-void lectCellule(int ligne, int writeBack){
-	// Lecture du contenu d'une ligne.
-	// writeBack == 1 active le Write-Back. L'opération de lecture étant normalement destructive,
-	// ce paramètre doit être activé si l'on souhaite réutiliser plus tard le contenu de la ligne.
+void lectCellule(int ligne, int writeBack) {
+    Serial.print("Lecture de la cellule sur la ligne : ");
+    Serial.println(ligne);
+    if (writeBack == 1) {
+        Serial.println("Write-back activé pour cette lecture.");
+    } else {
+        Serial.println("Write-back non activé pour cette lecture.");
+    }
 
-	// Sélection de la ligne
-	scWLSL(ligne);
+    // Sélection de la ligne
+    scWLSL(ligne);
 
-	// Copie du chronogramme (cf 4.4.1.1 de la thèse de mr Francois)
-	pON(PORTD, SET_PARA);
-	clk();
-	pON(PORTD, PRE);
-	clk();
-	pON(PORTD, WL);
-	clk();
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
-	pON(PORTD, SL);
-	clk();
-	pON(PORTD, SA);
-	clk();
-	clk();
-	clk();
-	clk();
-	pOFF(PORTD, SL);
-	pOFF(PORTD, SA);
-	if(writeBack == 1){
-		pON(PORTD, WB);
-	}
-	clk();
-	pON(PORTD, PRE);
-	pOFF(PORTD, WB);
-	clk();
-	clk();
-	pOFF(PORTD, WL);
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
-	pOFF(PORTD, SET_PARA);
-	clk();
+    // Copie du chronogramme (cf 4.4.1.1 de la thèse de mr Francois)
+    pON(PORTD, SET_PARA);
+    clk();
+    pON(PORTD, PRE);
+    clk();
+    pON(PORTD, WL);
+    clk();
+    clk();
+    pOFF(PORTD, PRE);
+    clk();
+    pON(PORTD, SL);
+    clk();
+    pON(PORTD, SA);
+    clk();
+    clk();
+    clk();
+    clk();
+    pOFF(PORTD, SL);
+    pOFF(PORTD, SA);
+    if (writeBack == 1) {
+        pON(PORTD, WB);
+        Serial.println("Signal WB activé.");
+    }
+    clk();
+    pON(PORTD, PRE);
+    pOFF(PORTD, WB);
+    clk();
+    clk();
+    pOFF(PORTD, WL);
+    clk();
+    pOFF(PORTD, PRE);
+    clk();
+    pOFF(PORTD, SET_PARA);
+    clk();
 }
+
+
 
 int lecture(int ligne, int colonne){
 	int lu = 0;
-		for(int i = 0; i < 8; i++){
-		lectCellule(ligne, (colonne - 1) * 8);
-		if(lect(PINB, SC_OUT) != 0){
-			lu += pow(2, i);
-		}
-	}
+		for (int i = 0; i < 8; i++) {
+    lectCellule(ligne, 1);  // Utilisation de `1` pour activer le write-back après lecture
+    if (lect(PINB, SC_OUT) != 0) {
+        lu += pow(2, i);
+    }
+}
+
 	return lu;
 }
 
@@ -255,24 +267,24 @@ void affMenu(bool premAff){
 	Serial.println("3. Export des données contenues dans la mémoire vers un txt.");
 }
 
-void setup(){
-	// Configuration des pins
-	pinMode(WB, OUTPUT);
-	pinMode(SA, OUTPUT);
-	pinMode(SL, OUTPUT);
-	pinMode(WL, OUTPUT);
-	pinMode(PRE, OUTPUT);
-	pinMode(BL, OUTPUT);
-	pinMode(CLOCK, OUTPUT);
-	pinMode(SC_IN, OUTPUT);
-	pinMode(SC_SEL_ZERO, OUTPUT);
-	pinMode(SC_SEL_UN, OUTPUT);
+void setup() {
+  // Configuration des pins
+  pinMode(WB, OUTPUT);
+  pinMode(SA, OUTPUT);
+  pinMode(SL, OUTPUT);
+  pinMode(WL, OUTPUT);
+  pinMode(PRE, OUTPUT);
+  pinMode(BL, OUTPUT);
+  pinMode(CLOCK, OUTPUT);
+  pinMode(SC_IN, OUTPUT);
+  pinMode(SC_SEL_ZERO, OUTPUT);
+  pinMode(SC_SEL_UN, OUTPUT);
 
-	pinMode(SC_OUT, INPUT);
+  pinMode(SC_OUT, INPUT);
 
-	// Interface homme-machine par le moniteur série
-	Serial.begin(9600);
-	affMenu(true);
+    // Interface homme-machine par le moniteur série
+  Serial.begin(9600);
+  affMenu(true);
 }
 
 void loop(){
@@ -289,7 +301,7 @@ void loop(){
 			Serial.println("Entier non signé 8 bits (0 <= nb <= 255) à écrire :");
 			while(not repValide){	 
 				while(!Serial.available());// Attente d'une réponse
-				reponse = Serial.readStringUntil('\n');
+				reponse = Serial.readStringUntil("\n");
 				repValide = testRepValide(reponse, 0, 255);
 				repBits = stringToIntToBytes(reponse);
 			}
