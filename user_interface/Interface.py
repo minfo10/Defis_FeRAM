@@ -3,8 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import webbrowser
-import Importation
-import Exportation
+import ImportExport
 import time
 import serial
 import serial.tools.list_ports
@@ -54,10 +53,6 @@ class Interface(tk.Tk):
         menuHelp = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label='Help', menu=menuHelp)
         menuHelp.add_command(label='GitHub', command=self.open_github)
-
-    def reset(self):
-        # Placeholder pour la méthode Reset
-        print("Reset triggered")  # Action temporaire
 
     def connection_section(self):
         # Cadre principal pour la connexion et informations
@@ -149,19 +144,16 @@ class Interface(tk.Tk):
           
     # Différentes fonctions
     def exportation(self):
-            exportWindow = Exportation.ExportInterface()    
+            exportWindow = ImportExport.ExportInterface()    
             exportWindow.mainloop()
 
     def importation(self):
-            exportWindow = Importation.ImportInterface()
+            exportWindow = ImportExport.ImportInterface()
             exportWindow.mainloop()
 
     def open_github(self):
     # Ouvre le lien GitHub dans le navigateur par défaut
         webbrowser.open("https://github.com/minfo10/Defis_FeRAM")
-
-    def close(self):
-        self.destroy()
 
     def check_connection(self):
         port = self.port_com.get()
@@ -176,6 +168,15 @@ class Interface(tk.Tk):
             self.connection_status.set("Non connecté")
             self.style.configure("Voyant.TLabel", background="red")  # Change voyant to red
             print(f"Erreur de connexion: {e}")
+            
+    def reset(self):
+        # Placeholder pour la méthode Reset
+        print("Reset triggered")  # Action temporaire
+
+    def close(self):
+        self.destroy()
+
+    
 
 # Fonction pour recevoir les données depuis l'arduino de controle
     def receive_data(self):
@@ -270,13 +271,15 @@ class Interface(tk.Tk):
             ser = serial.Serial(port, baud)
             time.sleep(2)  # Attendre que la connexion s'établisse
 
+            delay = 0.1
+
             # Envoyer le nombre à l'Arduino
             ser.write("1\n".encode())
-            time.sleep(1)
+            time.sleep(delay)
             ser.write((str(number_to_send) + "\n").encode())
-            time.sleep(1)
+            time.sleep(delay)
             ser.write((str(ligne) + "\n").encode())
-            time.sleep(1)
+            time.sleep(delay)
             ser.write((str(colonne) + "\n").encode())
 
 
@@ -285,8 +288,8 @@ class Interface(tk.Tk):
                 try:
                     # Lire une ligne depuis le port série
                     donnee = ser.readline().decode().strip()  # Décodage et nettoyage
-                    for i in range(0,6):
-                        print(f"Donnée reçue : {ser.readline().decode().strip()}")
+                    for i in range(0,10):
+                        print(f"{ser.readline().decode().strip()}")
 
                     # Ajouter la ligne à la liste
                     lines.append(donnee)
@@ -298,18 +301,17 @@ class Interface(tk.Tk):
                         messagebox.showinfo("Info",f"{derniere_ligne}")
                         # Vous pouvez sortir de la boucle ou faire d'autres traitements ici
                     break  # Sortir de la boucle après avoir lu la sixième ligne
-        
-
-                except serial.SerialException as e:
-                # Affiche une boîte de message en cas de port indisponible
-                    messagebox.showerror("Erreur de port", f"{e}")
-
                 except ValueError:
                     messagebox.showerror("Erreur de valeur", f"Veuillez entrer un nombre valide.")
 
+        except serial.SerialException as e:
+            # Affiche une boîte de message en cas de port indisponible
+            messagebox.showerror("Erreur de port", f"{e}")
+
         finally:
             # Fermer le port série
-            ser.close()
+            if 'ser' in locals() and ser.is_open:
+                ser.close()
 
 
             #I have an issue, my arduino cannot read the data i sent it and when i try to get serial data, it only shows me the first line. Can you help me and maybe do a clean
