@@ -30,25 +30,30 @@ void clk(){
 	delayMicroseconds(2);
 	pOFF(PORTD, CLOCK);
 }
-
 void scWLSL(int ligne) {
-    Serial.print("Sélection de la ligne : ");
-    Serial.println(ligne);
+    // Vérifie si la ligne est dans la plage valide
+    if (ligne < 0 || ligne >= 128) {
+        Serial.println("Erreur : Ligne non valide. Valeur doit être entre 0 et 127.");
+        return;
+    }
 
+    // Sélection de la bonne Scan Chain
     pON(PORTB, SC_SEL_ZERO);
     pOFF(PORTB, SC_SEL_UN);
 
+    Serial.print("Sélection de la ligne : ");
+    Serial.println(ligne);
+
     for (int i = 0; i < 128; i++) {
-        if (i == ligne) {
-            Serial.print("Sélection de la ligne dans la chaîne de scan : ");
-            Serial.println(i);
+        if (i == ligne) { // Si la i-ième ligne est la ligne choisie
             pON(PORTB, SC_IN);
-            clk();
-            clk();
-            clk();
+            clk();  // Une seule impulsion est suffisante pour indiquer la sélection
             pOFF(PORTB, SC_IN);
+            Serial.print("Ligne ");
+            Serial.print(i);
+            Serial.println(" sélectionnée.");
         } else {
-            clk();
+            clk(); // Impulsion de clock pour les autres lignes
         }
     }
 }
@@ -75,28 +80,42 @@ int scOut(){
 	return resultat;
 }
 
-void scBL(byte rep[8], int colonne){
-	// cf implémentation de l'écriture unitaire
-	// A VERIFIER SUR CARTE -----------------------------------------------
-	pOFF(PORTB, SC_SEL_ZERO);
-	pON(PORTB, SC_SEL_UN);
+void scBL(byte rep[8], int colonne) {
+    // Vérifie si la colonne est dans la plage valide
+    if (colonne < 1 || colonne > 16) {
+        Serial.println("Erreur : Colonne non valide. Valeur doit être entre 1 et 16.");
+        return;
+    }
 
-	for(int i = 0; i < 120; i++){
-		if(i == (colonne - 1) * 8){
-			for(int j = 0; j < 8; j++){
-				if(rep[j] == 0){
-					pON(PORTB, SC_IN);
-					clk();
-					pOFF(PORTB, SC_IN);
-				} else clk();
-			}
-		} else {
-			pON(PORTB, SC_IN);
-			clk();
-			pOFF(PORTB, SC_IN);
-		}
-	}
+    // Sélection de la bonne Scan Chain
+    pOFF(PORTB, SC_SEL_ZERO);
+    pON(PORTB, SC_SEL_UN);
+
+    Serial.print("Sélection de la colonne : ");
+    Serial.println(colonne);
+
+    int startIndex = (colonne - 1) * 8;  // Calcul de l'index de début pour la colonne
+
+    for (int i = 0; i < 120; i++) {
+        if (i == startIndex) {
+            for (int j = 0; j < 8; j++) {
+                if (rep[j] == 0) {
+                    pON(PORTB, SC_IN);
+                    clk();
+                    pOFF(PORTB, SC_IN);
+                } else {
+                    clk();
+                }
+            }
+            Serial.print("Colonne ");
+            Serial.print(colonne);
+            Serial.println(" traitée.");
+        } else {
+            clk();  // Impulsions pour les autres colonnes
+        }
+    }
 }
+
 
 void zeroPara(int ligne){
 	// Programmation parallèle d'un 0 sur toute la ligne en argument.
@@ -287,95 +306,116 @@ void setup() {
   affMenu(true);
 }
 
-void loop(){
-	// Ajouter vérification isNaN
-	if(Serial.available() > 0){ // Attente d'une réponse de l'utilisateur
-		String reponse = Serial.readStringUntil('\n');
-		int repInt = reponse.toInt();
+void loop() {
+    if (Serial.available() > 0) { // Attente d'une réponse de l'utilisateur
+        String reponse = Serial.readStringUntil('\n');
+        int repInt = reponse.toInt();
 
-		// Switch bugué ici.
-		if(repInt == 1){ // Ecriture d'un entier 8bits (pour l'instant, objectif stocker float https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format)
-			// Nombre à coder.
-			bool repValide = false;
-			byte repBits;
-			Serial.println("Entier non signé 8 bits (0 <= nb <= 255) à écrire :");
-			while(not repValide){	 
-				while(!Serial.available());// Attente d'une réponse
-				reponse = Serial.readStringUntil("\n");
-				repValide = testRepValide(reponse, 0, 255);
-				repBits = stringToIntToBytes(reponse);
-			}
-			
+        if (repInt == 1) { // Écriture d'un entier 8 bits
+            // Nombre à coder
+            bool repValide = false;
+            byte repBits[8];  // Note : correction pour créer un tableau de 8 bits
+            Serial.println("Entier non signé 8 bits (0 <= nb <= 255) à écrire :");
 
-			// Position.
+            while (!repValide) {
+                while (!Serial.available()); // Attente d'une réponse
+                reponse = Serial.readStringUntil('\n');
+                repValide = testRepValide(reponse, 0, 255);
+                if (repValide) {
+                    // Transformation de la réponse en tableau de bits
+                    byte* repBitsTemp = stringToIntToBytes(reponse);
+                    for (int i = 0; i < 8; i++) {
+                        repBits[i] = repBitsTemp[i];
+                    }
+                } else {
+                    Serial.println("Valeur incorrecte, veuillez entrer un nombre entre 0 et 255.");
+                }
+            }
 
-				// Ligne
-			int ligne = -1;
-			repValide = false;
-			Serial.println("Ligne ? (Entre 1 et 128)");
-			while(not repValide){
-				while(!Serial.available());// Attente d'une réponse
-				reponse = Serial.readStringUntil('\n');
-				repValide = testRepValide(reponse, 1, 128);
-				ligne = reponse.toInt();
-			}
+            // Position Ligne
+            int ligne = -1;
+            repValide = false;
+            Serial.println("Ligne ? (Entre 1 et 128)");
 
-			
-				// Colonne
-			int colonne = -1;
-			repValide = false;
-			Serial.println("Colonne ? (Entre 1 et 16)"); 
-			while(not repValide){
-				while(!Serial.available());// Attente d'une réponse
-				reponse = Serial.readStringUntil('\n');
-				repValide = testRepValide(reponse, 1, 16);
-				colonne = reponse.toInt();
-			}
-			
+            while (!repValide) {
+                while (!Serial.available()); // Attente d'une réponse
+                reponse = Serial.readStringUntil('\n');
+                repValide = testRepValide(reponse, 1, 128);
+                if (repValide) {
+                    ligne = reponse.toInt();
+                } else {
+                    Serial.println("Valeur de ligne incorrecte, veuillez entrer un nombre entre 1 et 128.");
+                }
+            }
 
-			// Codage.
-			// Remise à 1.
-			byte* queDes1 = '11111111';
-			scBL(queDes1, (colonne - 1) * 8); // Remise à 1 de l'octet.
-			unPara(ligne); // scWLSL déjà dans unPara.
+            // Position Colonne
+            int colonne = -1;
+            repValide = false;
+            Serial.println("Colonne ? (Entre 1 et 16)");
 
-			// Placement des 0.
-			scBL(repBits, (colonne - 1) * 8);
-			zeroUnitaire();
+            while (!repValide) {
+                while (!Serial.available()); // Attente d'une réponse
+                reponse = Serial.readStringUntil('\n');
+                repValide = testRepValide(reponse, 1, 16);
+                if (repValide) {
+                    colonne = reponse.toInt();
+                } else {
+                    Serial.println("Valeur de colonne incorrecte, veuillez entrer un nombre entre 1 et 16.");
+                }
+            }
 
-			Serial.println("Écriture réussie !");
-			affMenu(false);
+            // Codage
+            Serial.println("Écriture en cours...");
+            unPara(ligne); // Remet tous les bits de la ligne à 1
 
-		} else if(repInt == 2){
-			// Position.
-			int ligne = -1;
-			bool repValide = false;
-			while(not repValide){
-				Serial.println("Ligne ? (Entre 1 et 128)"); 
-				while(!Serial.available());// Attente d'une réponse
-				reponse = Serial.readStringUntil('\n');
-				repValide = testRepValide(reponse, 1, 128);
-				ligne = reponse.toInt();
-			} 
-			
-			int colonne = -1;
-			repValide = false;
-			while(not repValide){
-				Serial.println("Colonne ? (Entre 1 et 16)"); 
-				while(!Serial.available());// Attente d'une réponse
-				reponse = Serial.readStringUntil('\n');
-				repValide = testRepValide(reponse, 1, 16);
-				colonne = reponse.toInt();
-			}
-			
-			// Lecture.
-			int lu = lecture(ligne, colonne);
-			Serial.println(lu);
+            // Placement des bits
+            scBL(repBits, colonne); // Écriture de la colonne spécifiée avec les bits donnés
 
-		} else if(repInt == 3){
-			Serial.println("//");
-		} else {
-			Serial.println("Incorrect");
-		}
-	}
+            Serial.println("Écriture réussie !");
+            affMenu(false);
+
+        } else if (repInt == 2) { // Lecture
+            // Position Ligne
+            int ligne = -1;
+            bool repValide = false;
+            Serial.println("Ligne ? (Entre 1 et 128)");
+
+            while (!repValide) {
+                while (!Serial.available()); // Attente d'une réponse
+                reponse = Serial.readStringUntil('\n');
+                repValide = testRepValide(reponse, 1, 128);
+                if (repValide) {
+                    ligne = reponse.toInt();
+                } else {
+                    Serial.println("Valeur de ligne incorrecte, veuillez entrer un nombre entre 1 et 128.");
+                }
+            }
+
+            // Position Colonne
+            int colonne = -1;
+            repValide = false;
+            Serial.println("Colonne ? (Entre 1 et 16)");
+
+            while (!repValide) {
+                while (!Serial.available()); // Attente d'une réponse
+                reponse = Serial.readStringUntil('\n');
+                repValide = testRepValide(reponse, 1, 16);
+                if (repValide) {
+                    colonne = reponse.toInt();
+                } else {
+                    Serial.println("Valeur de colonne incorrecte, veuillez entrer un nombre entre 1 et 16.");
+                }
+            }
+
+            // Lecture
+            int lu = lecture(ligne, colonne);
+            Serial.print("Valeur lue : ");
+            Serial.println(lu);
+
+        } else if (repInt == 3) {
+            Serial.println("Export des données (pas encore implémenté)...");
+        } else {
+            Serial.println("Option incorrecte, veuillez entrer un nombre entre 1 et 3.");
+        }
+    }
 }
