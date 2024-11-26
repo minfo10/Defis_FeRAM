@@ -144,7 +144,7 @@ class Interface(tk.Tk):
           
     # Différentes fonctions
     def exportation(self):
-            exportWindow = Exportation.ExportInterface()    
+            exportWindow = ImportExport.ExportInterface()    
             exportWindow.mainloop()
 
     def importation(self):
@@ -299,18 +299,17 @@ class Interface(tk.Tk):
                         messagebox.showinfo("Info",f"{derniere_ligne}")
                         # Vous pouvez sortir de la boucle ou faire d'autres traitements ici
                     break  # Sortir de la boucle après avoir lu la sixième ligne
-        
-
-                except serial.SerialException as e:
-                # Affiche une boîte de message en cas de port indisponible
-                    messagebox.showerror("Erreur de port", f"{e}")
-
                 except ValueError:
                     messagebox.showerror("Erreur de valeur", f"Veuillez entrer un nombre valide.")
 
+        except serial.SerialException as e:
+            # Affiche une boîte de message en cas de port indisponible
+            messagebox.showerror("Erreur de port", f"{e}")
+
         finally:
             # Fermer le port série
-            ser.close()
+            if 'ser' in locals() and ser.is_open:
+                ser.close()
 
 
             #I have an issue, my arduino cannot read the data i sent it and when i try to get serial data, it only shows me the first line. Can you help me and maybe do a clean
