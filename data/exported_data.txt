@@ -1,4 +1,1 @@
-Sample data:
-Value 1: 123
-Value 2: 456
-Value 3: 789
+FeRAM Controller Setup Completed

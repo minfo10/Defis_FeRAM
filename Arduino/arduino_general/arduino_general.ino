@@ -357,6 +357,7 @@ void unPara(int ligne){
 	clk();
 }
 
+
 void zeroUnitaire(){
 	pON(PORTD, PRE);
 	clk();
