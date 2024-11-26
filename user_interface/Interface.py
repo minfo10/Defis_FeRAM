@@ -271,13 +271,15 @@ class Interface(tk.Tk):
             ser = serial.Serial(port, baud)
             time.sleep(2)  # Attendre que la connexion s'établisse
 
+            delay = 0.1
+
             # Envoyer le nombre à l'Arduino
             ser.write("1\n".encode())
-            time.sleep(1)
+            time.sleep(delay)
             ser.write((str(number_to_send) + "\n").encode())
-            time.sleep(1)
+            time.sleep(delay)
             ser.write((str(ligne) + "\n").encode())
-            time.sleep(1)
+            time.sleep(delay)
             ser.write((str(colonne) + "\n").encode())
 
 
@@ -286,8 +288,8 @@ class Interface(tk.Tk):
                 try:
                     # Lire une ligne depuis le port série
                     donnee = ser.readline().decode().strip()  # Décodage et nettoyage
-                    for i in range(0,6):
-                        print(f"Donnée reçue : {ser.readline().decode().strip()}")
+                    for i in range(0,10):
+                        print(f"{ser.readline().decode().strip()}")
 
                     # Ajouter la ligne à la liste
                     lines.append(donnee)
