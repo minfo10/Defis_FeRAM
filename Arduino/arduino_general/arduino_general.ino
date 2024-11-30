@@ -103,14 +103,16 @@ void ecriture() {
     int colonne = obtenirPosition("Colonne ? (Entre 1 et 16)", 1, 16);
 
     // 3. Codage de l'entier
-    byte* queDes1 = "11111111"; // Tout placer à 1 d'abord
-    scBL(queDes1, (colonne - 1) * 8); // Remettre à 1 l'octet
-    unPara(ligne);                   // Programmation parallèle d'un 1
-    scBL(repBits, (colonne - 1) * 8); // Écriture des bits
 
-    zeroUnitaire(); // Effacement unitaire
-    Serial.println("Écriture réussie !");
-    affMenu(false); // Retour au menu
+          Serial.println("Écriture en cours...");
+          unPara(ligne); // Remet tous les bits de la ligne à 1
+
+            // Placement des bits
+          scBL(repBits, colonne); // Écriture de la colonne spécifiée avec les bits donnés
+
+          Serial.println("Écriture réussie !");
+          affMenu(false);
+
 }
 
 // *** Lecture de la mémoire ***
@@ -235,23 +237,29 @@ byte stringToIntToBytes(String rep){
 
 // *** Sélection des lignes et colonnes ***
 void scWLSL(int ligne) {
-    Serial.print("Sélection de la ligne : ");
-    Serial.println(ligne);
+    // Vérifie si la ligne est dans la plage valide
+    if (ligne < 0 || ligne >= 128) {
+        Serial.println("Erreur : Ligne non valide. Valeur doit être entre 0 et 127.");
+        return;
+    }
 
+    // Sélection de la bonne Scan Chain
     pON(PORTB, SC_SEL_ZERO);
     pOFF(PORTB, SC_SEL_UN);
 
+    Serial.print("Sélection de la ligne : ");
+    Serial.println(ligne);
+
     for (int i = 0; i < 128; i++) {
-        if (i == ligne) {
-            Serial.print("Sélection de la ligne dans la chaîne de scan : ");
-            Serial.println(i);
+        if (i == ligne) { // Si la i-ième ligne est la ligne choisie
             pON(PORTB, SC_IN);
-            clk();
-            clk();
-            clk();
+            clk();  // Une seule impulsion est suffisante pour indiquer la sélection
             pOFF(PORTB, SC_IN);
+            Serial.print("Ligne ");
+            Serial.print(i);
+            Serial.println(" sélectionnée.");
         } else {
-            clk();
+            clk(); // Impulsion de clock pour les autres lignes
         }
     }
 }
@@ -277,27 +285,46 @@ int scOut(){
 	return resultat;
 }
 
-void scBL(byte rep[8], int colonne){
-	// cf implémentation de l'écriture unitaire
-	// A VERIFIER SUR CARTE -----------------------------------------------
-	pOFF(PORTB, SC_SEL_ZERO);
-	pON(PORTB, SC_SEL_UN);
+void scBL(byte rep[8], int colonne) {
+    // Vérifie si la colonne est dans la plage valide
+    if (colonne < 1 || colonne > 16) {
+        Serial.println("Erreur : Colonne non valide. Valeur doit être entre 1 et 16.");
+        return;
+    }
 
-	for(int i = 0; i < 120; i++){
-		if(i == (colonne - 1) * 8){
-			for(int j = 0; j < 8; j++){
-				if(rep[j] == 0){
-					pON(PORTB, SC_IN);
-					clk();
-					pOFF(PORTB, SC_IN);
-				} else clk();
-			}
-		} else {
-			pON(PORTB, SC_IN);
-			clk();
-			pOFF(PORTB, SC_IN);
-		}
-	}
+    // Sélection de la bonne Scan Chain
+    pOFF(PORTB, SC_SEL_ZERO);
+    pON(PORTB, SC_SEL_UN);
+
+    Serial.print("Sélection de la colonne : ");
+    Serial.println(colonne);
+
+    int startIndex = (colonne - 1) * 8;  // Calcul de l'index de début pour la colonne
+
+    for (int i = 0; i < 128; i++) {
+        if (i >= startIndex && i < startIndex + 8) {
+            int bitIndex = i - startIndex; // Index dans le tableau rep[8]
+
+            if (rep[bitIndex] == 0) {
+                pON(PORTB, SC_IN);
+            } else {
+                pOFF(PORTB, SC_IN);
+            }
+
+            // Ajout d'un délai avant l'impulsion du clock pour stabilisation
+            delayMicroseconds(1);
+            clk(); // Une seule impulsion d'horloge après avoir placé SC_IN
+
+        } else {
+            pOFF(PORTB, SC_IN);  // Assure que SC_IN est toujours en état bas lorsqu'on n'écrit pas de valeur
+            delayMicroseconds(1);
+            clk();
+        }
+    }
+
+    Serial.print("Colonne ");
+    Serial.print(colonne);
+    Serial.println(" traitée.");
 }
 
 
@@ -356,7 +383,6 @@ void unPara(int ligne){
 	pOFF(PORTD, PRE);
 	clk();
 }
-
 
 void zeroUnitaire(){
 	pON(PORTD, PRE);
