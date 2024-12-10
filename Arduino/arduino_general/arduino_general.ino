@@ -1,11 +1,7 @@
-#include <math.h> // Pour isNaN et autres fonctions mathématiques
-
-// *** Manipulation directe des ports ***
-#define pON(port, pin) (port |= bit(pin))    // Mettre le pin à l'état HAUT
-#define pOFF(port, pin) (port &= ~bit(pin))  // Mettre le pin à l'état BAS
-#define lect(port, pin) ((port) & bit(pin))  // Lire l'état du pin
+#include <math.h>
 
 // *** Déclaration des broches ***
+// Assumes Arduino UNO-like board
 const int WB = A0;          // Write Back
 const int SA = A1;          // Sense Amplifier
 const int SL = 2;           // Source Line
@@ -19,7 +15,20 @@ const int SC_OUT = 9;       // Scan Chain OUT
 const int SC_SEL_ZERO = 10; // Scan Chain Select 0
 const int SC_SEL_UN = 11;   // Scan Chain Select 1
 
-// *** Setup : Configuration initiale ***
+void affMenu(bool premAff);
+void ecriture();
+void lecture();
+int obtenirPosition(const char* message, int min, int max);
+bool testRepValide(String reponse, int min, int max);
+uint8_t stringToIntToBytes(String rep);
+void clk();
+void scWLSL(int ligne);
+int scOut();
+void scBL(uint8_t repByte, int colonne);
+void zeroPara(int ligne);
+void unPara(int ligne);
+void zeroUnitaire();
+
 void setup() {
     pinMode(WB, OUTPUT);
     pinMode(SA, OUTPUT);
@@ -34,24 +43,34 @@ void setup() {
 
     pinMode(SC_OUT, INPUT);
 
-    Serial.begin(9600); // Initialisation de la communication série
-    affMenu(true);      // Affiche le menu
+    // Set all output pins to LOW initially
+    digitalWrite(WB, LOW);
+    digitalWrite(SA, LOW);
+    digitalWrite(SL, LOW);
+    digitalWrite(WL, LOW);
+    digitalWrite(PRE, LOW);
+    digitalWrite(BL, LOW);
+    digitalWrite(CLOCK, LOW);
+    digitalWrite(SC_IN, LOW);
+    digitalWrite(SC_SEL_ZERO, LOW);
+    digitalWrite(SC_SEL_UN, LOW);
+
+    Serial.begin(9600); 
+    affMenu(true); 
 }
 
 // *** Boucle principale : Interface utilisateur ***
-void loop(){
-	// Ajouter vérification isNaN
-	if(Serial.available() > 0){ // Attente d'une réponse de l'utilisateur
-		String reponse = Serial.readStringUntil('\n');
-		int repInt = reponse.toInt();
+void loop() {
+    if(Serial.available() > 0) {
+        String reponse = Serial.readStringUntil('\n');
+        int repInt = reponse.toInt();
 
-		// Menu interactif
         switch (repInt) {
             case 1:
-                ecriture(); // Fonction pour écrire dans la mémoire
+                ecriture(); 
                 break;
             case 2:
-                lecture();  // Fonction pour lire dans la mémoire
+                lecture();
                 break;
             case 3:
                 Serial.println("// Export des données pas encore implémenté.");
@@ -59,18 +78,16 @@ void loop(){
             default:
                 Serial.println("Option incorrecte. Veuillez réessayer.");
                 break;
-		}
-	}
+        }
+    }
 }
 
-
-
 // *** Gestion des I/O ***
-void clk(){
-    // Simule un coup d'horloge.	
-	pON(PORTD, CLOCK);
-	delayMicroseconds(2);
-	pOFF(PORTD, CLOCK);
+void clk() {
+    // Simule un coup d'horloge.
+    digitalWrite(CLOCK, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(CLOCK, LOW);
 }
 
 // *** Menu interactif ***
@@ -86,7 +103,7 @@ void affMenu(bool premAff) {
 // *** Écriture dans la mémoire ***
 void ecriture() {
     bool repValide = false;
-    byte repBits;
+    uint8_t repByte = 0;
     String reponse;
 
     // 1. Obtenir un entier à écrire
@@ -95,42 +112,38 @@ void ecriture() {
         while (!Serial.available());
         reponse = Serial.readStringUntil('\n');
         repValide = testRepValide(reponse, 0, 255);
-        repBits = stringToIntToBytes(reponse);
+        if (repValide) {
+            repByte = stringToIntToBytes(reponse);
+        }
     }
 
     // 2. Obtenir la ligne et la colonne
     int ligne = obtenirPosition("Ligne ? (Entre 1 et 128)", 1, 128);
     int colonne = obtenirPosition("Colonne ? (Entre 1 et 16)", 1, 16);
 
-    // 3. Codage de l'entier
+    Serial.println("Écriture en cours...");
+    unPara(ligne); // Remet tous les bits de la ligne à 1
 
-          Serial.println("Écriture en cours...");
-          unPara(ligne); // Remet tous les bits de la ligne à 1
+    // Placement des bits
+    scBL(repByte, colonne); // Écriture de la colonne spécifiée avec les bits donnés
 
-            // Placement des bits
-          scBL(repBits, colonne); // Écriture de la colonne spécifiée avec les bits donnés
-
-          Serial.println("Écriture réussie !");
-          affMenu(false);
-
+    Serial.println("Écriture réussie !");
+    affMenu(false);
 }
 
 // *** Lecture de la mémoire ***
 void lecture() {
-    // Obtenir la position de la cellule à lire
     int ligne = obtenirPosition("Ligne ? (Entre 1 et 128)", 1, 128);
     int colonne = obtenirPosition("Colonne ? (Entre 1 et 16)", 1, 16);
 
-    // Demander à l'utilisateur si le write-back doit être activé
     Serial.println("Activer le write-back ? (1 = Oui, 0 = Non)");
     int writeBack = -1;
     while (writeBack < 0 || writeBack > 1) {
-        while (!Serial.available()); // Attente d'une réponse
+        while (!Serial.available());
         String reponse = Serial.readStringUntil('\n');
         writeBack = reponse.toInt();
     }
 
-    // Initialisation pour la lecture
     Serial.print("Lecture de la cellule en ligne ");
     Serial.print(ligne);
     Serial.print(", colonne ");
@@ -145,57 +158,58 @@ void lecture() {
     scWLSL(ligne);
 
     // Configuration des signaux pour la lecture
-    pON(PORTD, SET_PARA);
+    digitalWrite(SET_PARA, HIGH);
     clk();
-    pON(PORTD, PRE);
+    digitalWrite(PRE, HIGH);
     clk();
-    pON(PORTD, WL);
+    digitalWrite(WL, HIGH);
     clk();
     clk();
-    pOFF(PORTD, PRE);
+    digitalWrite(PRE, LOW);
     clk();
-    pON(PORTD, SL);
+    digitalWrite(SL, HIGH);
     clk();
-    pON(PORTD, SA);
+    digitalWrite(SA, HIGH);
     clk();
 
     // Lecture des 8 bits de la colonne spécifiée
     int valeur = 0;
     for (int i = 0; i < 8; i++) {
         clk();
-        if (lect(PINB, SC_OUT) != 0) { // Si un '1' est détecté
-            valeur += pow(2, i);
+        int bitVal = digitalRead(SC_OUT);
+        if (bitVal == HIGH) {
+            valeur += (int)pow(2, i);
         }
     }
 
     // Gestion du write-back si activé
     if (writeBack == 1) {
-        pON(PORTD, WB);
+        digitalWrite(WB, HIGH);
         clk();
-        pOFF(PORTD, WB);
+        digitalWrite(WB, LOW);
     }
 
     // Fin de la lecture
     clk();
-    pOFF(PORTD, SL);
-    pOFF(PORTD, SA);
+    digitalWrite(SL, LOW);
+    digitalWrite(SA, LOW);
     clk();
-    pON(PORTD, PRE);
+    digitalWrite(PRE, HIGH);
     clk();
     clk();
-    pOFF(PORTD, WL);
+    digitalWrite(WL, LOW);
     clk();
-    pOFF(PORTD, PRE);
+    digitalWrite(PRE, LOW);
     clk();
-    pOFF(PORTD, SET_PARA);
+    digitalWrite(SET_PARA, LOW);
     clk();
 
     // Résultat de la lecture
     Serial.print("Valeur lue : ");
     Serial.println(valeur);
+
+    affMenu(false);
 }
-
-
 
 // *** Fonction auxiliaire : Obtenir une position ***
 int obtenirPosition(const char* message, int min, int max) {
@@ -223,100 +237,108 @@ bool testRepValide(String reponse, int min, int max) {
     }
 }
 
-// *** Conversion d'un String en tableau de bits ***
-byte stringToIntToBytes(String rep){
-	int repInt = rep.toInt();
-	byte repBits[8];
-	for(byte i = 0; i < 8; i++){
-		repBits[i] = ~ bitRead(repInt, i); // NOT bit --> Il est préférable de tout placer à 1 puis placer les 0 (cf fonction scBL)
-	}
-	return repBits;
+// *** Conversion d'un String en un octet ***
+// Retourne un uint8_t avec les bits invertis par rapport au repInt original (si cela est souhaité)
+uint8_t stringToIntToBytes(String rep) {
+    int repInt = rep.toInt();
+    // Selon le code initial, il semblait vouloir inverser les bits
+    // mais ce n'était pas très clair. On peut conserver la logique originale:
+    // repBits[i] = ~bitRead(repInt, i)
+    // Ce qui revient à prendre le complément de repInt pour ce qui est stocké.
+    // Simplifions : On peut simplement retourner ~repInt (inversion des bits)
+    // Mais attention, ~repInt sur 16 bits n'est pas correct pour un octet.
+    // On s'en tient à la logique initiale, qui faisait un bit par bit.
+    uint8_t result = 0;
+    for (byte i = 0; i < 8; i++) {
+        // Inversion du bit
+        uint8_t bitVal = bitRead(repInt, i);
+        bitVal = ~bitVal & 0x01; // Inverse le bit (0 -> 1, 1 -> 0)
+        if (bitVal == 1) {
+            result |= (1 << i);
+        }
+    }
+    return result;
 }
 
-
-
-// *** Sélection des lignes et colonnes ***
+// *** Sélection des lignes ***
 void scWLSL(int ligne) {
-    // Vérifie si la ligne est dans la plage valide
     if (ligne < 0 || ligne >= 128) {
         Serial.println("Erreur : Ligne non valide. Valeur doit être entre 0 et 127.");
         return;
     }
 
     // Sélection de la bonne Scan Chain
-    pON(PORTB, SC_SEL_ZERO);
-    pOFF(PORTB, SC_SEL_UN);
+    digitalWrite(SC_SEL_ZERO, HIGH);
+    digitalWrite(SC_SEL_UN, LOW);
 
     Serial.print("Sélection de la ligne : ");
     Serial.println(ligne);
 
+    // Pour chaque ligne, on envoie un pulse de clock
+    // Si c'est la ligne sélectionnée, on met SC_IN à HIGH pour un cycle
     for (int i = 0; i < 128; i++) {
-        if (i == ligne) { // Si la i-ième ligne est la ligne choisie
-            pON(PORTB, SC_IN);
-            clk();  // Une seule impulsion est suffisante pour indiquer la sélection
-            pOFF(PORTB, SC_IN);
+        if (i == ligne) {
+            digitalWrite(SC_IN, HIGH);
+            clk();
+            digitalWrite(SC_IN, LOW);
             Serial.print("Ligne ");
             Serial.print(i);
             Serial.println(" sélectionnée.");
         } else {
-            clk(); // Impulsion de clock pour les autres lignes
+            digitalWrite(SC_IN, LOW);
+            clk();
         }
     }
 }
 
-int scOut(){
-	// Permet de lire la valeur stockée dans la ligne préalablement choisie par l'appel de la fonction scWLSL.
+int scOut() {
+    // Sélection de la bonne Scan Chain
+    digitalWrite(SC_SEL_ZERO, LOW);
+    digitalWrite(SC_SEL_UN, LOW);
 
-	// Sélection de la bonne Scan Chain (cf 4.4.2.1 de la thèse de Mr Francois)
-	pOFF(PORTB, SC_SEL_ZERO);
-	pOFF(PORTB, SC_SEL_UN);
-
-	int resultat = 0; // Valeur stockée dans la ligne choisie
-
-	for(int i = 0; i < 128; i++){ // Lecture des 128 blocs d'une ligne
-		clk();
-
-		// A VERIFIER SUR CARTE -----------------------------------------------
-		if (lect(PORTB, SC_OUT) != 0){ // la i-ième cellule contient un 1
-			resultat += pow(2, i);
-		}
-	}
-
-	return resultat;
+    int resultat = 0;
+    for(int i = 0; i < 128; i++) {
+        clk();
+        int bitVal = digitalRead(SC_OUT);
+        if (bitVal == HIGH) {
+            resultat += (int)pow(2, i);
+        }
+    }
+    return resultat;
 }
 
-void scBL(byte rep[8], int colonne) {
-    // Vérifie si la colonne est dans la plage valide
+void scBL(uint8_t repByte, int colonne) {
     if (colonne < 1 || colonne > 16) {
         Serial.println("Erreur : Colonne non valide. Valeur doit être entre 1 et 16.");
         return;
     }
 
     // Sélection de la bonne Scan Chain
-    pOFF(PORTB, SC_SEL_ZERO);
-    pON(PORTB, SC_SEL_UN);
+    digitalWrite(SC_SEL_ZERO, LOW);
+    digitalWrite(SC_SEL_UN, HIGH);
 
     Serial.print("Sélection de la colonne : ");
     Serial.println(colonne);
 
-    int startIndex = (colonne - 1) * 8;  // Calcul de l'index de début pour la colonne
+    int startIndex = (colonne - 1) * 8;
 
     for (int i = 0; i < 128; i++) {
-        if (i >= startIndex && i < startIndex + 8) {
-            int bitIndex = i - startIndex; // Index dans le tableau rep[8]
-
-            if (rep[bitIndex] == 0) {
-                pON(PORTB, SC_IN);
+        if (i >= startIndex && i < (startIndex + 8)) {
+            int bitIndex = i - startIndex;
+            uint8_t bitVal = (repByte >> bitIndex) & 0x01;
+            // Le code initial inversait les bits, on le laisse tel quel
+            // repBits[i] était un bit inversé, on a déjà repByte inversé
+            // Ici, si bitVal == 0, SC_IN = HIGH (pour écrire un '0' inverté)
+            // Si bitVal == 1, SC_IN = LOW
+            if (bitVal == 0) {
+                digitalWrite(SC_IN, HIGH);
             } else {
-                pOFF(PORTB, SC_IN);
+                digitalWrite(SC_IN, LOW);
             }
-
-            // Ajout d'un délai avant l'impulsion du clock pour stabilisation
             delayMicroseconds(1);
-            clk(); // Une seule impulsion d'horloge après avoir placé SC_IN
-
+            clk();
         } else {
-            pOFF(PORTB, SC_IN);  // Assure que SC_IN est toujours en état bas lorsqu'on n'écrit pas de valeur
+            digitalWrite(SC_IN, LOW);
             delayMicroseconds(1);
             clk();
         }
@@ -327,82 +349,85 @@ void scBL(byte rep[8], int colonne) {
     Serial.println(" traitée.");
 }
 
-
-
 // *** Schémas pour coder les 0 et 1 ***
-void zeroPara(int ligne){
-	// Programmation parallèle d'un 0 sur toute la ligne en argument.
+void zeroPara(int ligne) {
+    scWLSL(ligne);
 
-	// Sélection de la ligne
-	scWLSL(ligne);
-
-	// Copie du chronogramme (cf 4.4.1.1 de la thèse de mr Francois)
-	pON(PORTD, PRE);
-	clk();
-	pON(PORTD, WL);
-	clk();
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
-	pON(PORTD, SL);
-	clk();
-	clk();
-	pOFF(PORTD, SL);
-	clk();
-	pON(PORTD, PRE);
-	clk();
-	clk();
-	pOFF(PORTD, WL);
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
+    digitalWrite(PRE, HIGH);
+    clk();
+    digitalWrite(WL, HIGH);
+    clk();
+    clk();
+    digitalWrite(PRE, LOW);
+    clk();
+    digitalWrite(SL, HIGH);
+    clk();
+    clk();
+    digitalWrite(SL, LOW);
+    clk();
+    digitalWrite(PRE, HIGH);
+    clk();
+    clk();
+    digitalWrite(WL, LOW);
+    clk();
+    digitalWrite(PRE, LOW);
+    clk();
 }
 
-void unPara(int ligne){
-	// Programmation parallèle d'un 1 sur toute la ligne en argument.
+void unPara(int ligne) {
+    scWLSL(ligne);
 
-	// Sélection de la ligne
-	scWLSL(ligne);
+    digitalWrite(PRE, HIGH);
+    delay(5);
+    clk();
+    digitalWrite(WL, HIGH);
+    delay(5); // Added delay to stabilize and observe WL HIGH level
+  clk();
+  delay(5);
+  clk();
+  delay(5);
+  digitalWrite(PRE, LOW);
+  delay(5);
+  digitalWrite(BL, HIGH);
+delay(5);
+clk();
+delay(5);
+clk();
+delay(5);
+digitalWrite(PRE, HIGH);
+delay(5);
+clk();
+delay(5);
+clk();
+delay(5);
+digitalWrite(WL, LOW);
+delay(5); // Delay to observe WL LOW level again
+digitalWrite(PRE, LOW);
+delay(5);
+clk();
+    delay(5);
 
-	// Copie du chronogramme (cf 4.4.1.1 de la thèse de mr Francois)
-	pON(PORTD, PRE);
-	clk();
-	pON(PORTD, WL);
-	clk();
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
-	pON(PORTD, BL);
-	clk();
-	clk();
-	pON(PORTD, PRE);
-	clk();
-	clk();
-	pOFF(PORTD, WL);
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
 }
 
-void zeroUnitaire(){
-	pON(PORTD, PRE);
-	clk();
-	pON(PORTD, WL);
-	clk();
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
-	pON(PORTD, SL);
-	pON(PORTD, BL);
-	clk();
-	pOFF(PORTD, SL);
-	pOFF(PORTD, BL);
-	clk();
-	pON(PORTD, PRE);
-	clk();
-	clk();
-	pOFF(PORTD, WL);
-	clk();
-	pOFF(PORTD, PRE);
-	clk();
+void zeroUnitaire() {
+    digitalWrite(PRE, HIGH);
+    clk();
+    digitalWrite(WL, HIGH);
+    clk();
+    clk();
+    digitalWrite(PRE, LOW);
+    clk();
+    digitalWrite(SL, HIGH);
+    digitalWrite(BL, HIGH);
+    clk();
+    digitalWrite(SL, LOW);
+    digitalWrite(BL, LOW);
+    clk();
+    digitalWrite(PRE, HIGH);
+    clk();
+    clk();
+    digitalWrite(WL, LOW);
+    clk();
+    digitalWrite(PRE, LOW);
+    clk();
 }
