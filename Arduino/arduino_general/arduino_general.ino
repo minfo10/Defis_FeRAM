@@ -96,6 +96,7 @@ void affMenu(bool premAff) {
   if (!premAff) {
     Serial.println("\n");
   }
+  Serial.println("\n");
   Serial.println("1. Écriture");
   Serial.println("2. Lecture");
   Serial.println("3. Export des données contenues dans la mémoire vers un fichier .txt");
@@ -147,12 +148,12 @@ void lecture() {
     writeBack = reponse.toInt();
   }
 
-  Serial.print("Lecture de la cellule en ligne ");
-  Serial.print(ligne);
-  Serial.print(", colonne ");
-  Serial.println(colonne);
+  //Serial.print("Lecture de la cellule en ligne ");
+  //Serial.print(ligne);
+  //Serial.print(", colonne ");
+  //Serial.println(colonne);
   if (writeBack == 1) {
-    Serial.println("Write-back activé pour cette lecture.");
+    Serial.println("Write-back activé");
   } else {
     Serial.println("Write-back désactivé.");
   }
