@@ -45,12 +45,6 @@ Le code est optimisé pour manipuler directement les registres matériels des po
 
 #### Manipulation directe des ports Arduino
 Pour garantir une meilleure efficacité, le programme n'utilise pas les fonctions standard digitalRead et digitalWrite pour accéder aux pins. À la place, il manipule directement les ports du microcontrôleur intégré, en interagissant avec leurs registres internes.
-
-    0101 0000 |
-               |
-    0100 0000 } Exemple d'état des pins
-               |
-    0000 0000 |
     
 ### Théorie : Ports et registres du microcontrôleur
 Le microcontrôleur d'une carte Arduino est divisé en ports, chacun responsable d'un groupe de pins.
@@ -66,44 +60,43 @@ Chaque port est constitué de trois registres binaires (8 bits chacun) :
 - `PINx` : Utilisé pour lire l'état des pins.
 - `DDRx` : Définit si les pins sont en entrée ou en sortie (Data Direction Register).
 
-| Exemple : État des pins d'un port
-| Si les pins numériques 1 et 3 sont à l'état haut (`HIGH`) et les autres pins du port D sont à l'état bas (`LOW`), la valeur du registre PORTD sera :
-| `0101 0000` (en binaire).
-| 
-| Remarque : L'ordre des bits est inversé. Le bit de poids faible (le dernier à droite) correspond au pin 0, tandis que le bit de poids fort (le premier à gauche) correspond au pin 7.
+*Exemple* : État des pins d'un port
+Si les pins numériques 1 et 3 sont à l'état haut (`HIGH`) et les autres pins du port D sont à l'état bas (`LOW`), la valeur du registre PORTD sera : `0101 0000` (en binaire).
+
+**Remarque** : L'ordre des bits est inversé. Le bit de poids faible (le dernier à droite) correspond au pin 0, tandis que le bit de poids fort (le premier à gauche) correspond au pin 7.
 
 ### Opérations binaires pour manipuler les pins
 
-
 Passage à l'état haut (`HIGH`)
 Pour mettre un pin à l'état haut, on utilise une opération OU inclusif (`OR`) sur le registre correspondant :
-|     0101 0000  (valeur actuelle du registre `PORTD`)
-| OU  0000 0100  (bit correspondant au pin 5)
-| =   0101 0100  (le pin 5 est maintenant à l'état haut)
+     0101 0000  (valeur actuelle du registre `PORTD`)
+ OU  0000 0100  (bit correspondant au pin 5)
+ =   0101 0100  (le pin 5 est maintenant à l'état haut)
 
 
 Passage à l'état bas (`LOW`)
 Pour mettre un pin à l'état bas, on utilise une opération ET NON (`AND NOT`) :
-|        0101 0100  (valeur actuelle du registre `PORTD`)
-| ET NON 0000 0100  (bit correspondant au pin 5)
-| =      0101 0000  (le pin 5 est maintenant à l'état bas)
+        0101 0100  (valeur actuelle du registre `PORTD`)
+ ET NON 0000 0100  (bit correspondant au pin 5)
+ =      0101 0000  (le pin 5 est maintenant à l'état bas)
 
 
 Lecture de l'état d'un pin
 Pour lire l'état d'un pin, on effectue une opération ET (`AND`) sur le registre correspondant, puis on interprète le résultat :
-|     0101 0000  (valeur actuelle du registre `PIND`)
-| ET  0100 0000  (bit correspondant au pin 6)
-| =   0100 0000  (résultat non nul : le pin 6 est à l'état haut)
+     0101 0000  (valeur actuelle du registre `PIND`)
+ ET  0100 0000  (bit correspondant au pin 6)
+ =   0100 0000  (résultat non nul : le pin 6 est à l'état haut)
 
 ### Implémentation
+
 Fonctions utilitaires
 Pour simplifier la manipulation des ports, trois fonctions de base ont été définies :
 
 - `pON(pin)` : Passe le pin spécifié à l'état haut.
 - `pOFF(pin)` : Passe le pin spécifié à l'état bas.
 - `lect(pin)` : Lit l'état d'un pin et retourne 1 (haut) ou 0 (bas).
-Ces fonctions permettent d'encapsuler les opérations binaires tout en offrant une interface claire pour l'utilisateur.
 
+Ces fonctions permettent d'encapsuler les opérations binaires tout en offrant une interface claire pour l'utilisateur.
 
 ### Programmes Arduino disponibles
 Le projet inclut plusieurs programmes spécialisés :
@@ -116,7 +109,7 @@ Le projet inclut plusieurs programmes spécialisés :
 
 ---
 
-## user_interface
+## Interface-Utilisateur
 
 Ce dépôt contient une interface graphique (GUI) conçue pour contrôler et collecter des données d'une station de sondage, spécifiquement pour la caractérisation des dispositifs FeRAM (Mémoire vive ferroélectrique). La GUI permet aux utilisateurs d'automatiser les séquences de sondage, de visualiser les données en temps réel et d'exporter les résultats pour des analyses supplémentaires.
 
