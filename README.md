@@ -49,12 +49,12 @@ Nous allons utiliser ces bibliothèques Python :
    - Regarder le `baudrate` et le `port`.
    - Compiler et téléverser sur votre carte Arduino.
 
-3. **Créer un environnement virtuel Python**
+3. **Créer et activer un environnement virtuel Python**
    - Pour Windows :
    ```bash
    cd ..
    cd ..
-   python3 -m venv env #Créez un environnement virtuel Python
+   python -m venv env #Créez un environnement virtuel Python
    .\env\Scripts\activate #Activez l'environnement virtuel
    ```
    - Pour Linux/MacOS :
