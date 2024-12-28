@@ -35,6 +35,24 @@ Nous allons utiliser ces bibliothèques Python :
    source env/bin/activate   # Sous Windows : env\Scripts\activate
    pip install -r requirements.txt
    ```
+   
+## Utilisation
+
+1. **Téléverser le programme Arduino sur la carte moniteur** : Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
+   ```bash
+   cd Arduino/arduino_general
+   ```
+   Ensuite, il faut lancer l'IDE Arduino.
+   Le baud qui doit être réglé à 9600.
+   Compilez et téléversez sur votre carte.
+   Notez par ailleurs le port où est branché la carte Arduino.
+2. **Exécutez le programme `main.py` avec Python** :
+   ```bash
+   cd ..
+   cd ..
+   cd user_interface
+   python main.py
+   ```
 
 ## Arduino
 
