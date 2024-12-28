@@ -38,7 +38,7 @@ Nous allons utiliser ces bibliothèques Python :
    - Pour GNOME (Ubuntu, Fedora...) :
    ```bash
    cd Arduino/arduino_general
-   nautilus .open .
+   nautilus .
    ```
    - Pour MacOS :
    ```bash
