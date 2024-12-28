@@ -136,7 +136,7 @@ Le projet inclut plusieurs programmes spécialisés :
 
 ## Interface-Utilisateur
 
-Ce dépôt contient une interface graphique (GUI) conçue pour contrôler et collecter des données d'une station de sondage, spécifiquement pour la caractérisation des dispositifs FeRAM (Mémoire vive ferroélectrique). La GUI permet aux utilisateurs d'automatiser les séquences de sondage, de visualiser les données en temps réel et d'exporter les résultats pour des analyses supplémentaires.
+L'interface graphique (GUI) est conçue pour pour caractériser des dispositifs FeRAM. La GUI permet aux utilisateurs d'envoyer et recevoir les données que l'on souhaite au travers de la mémoire FeRAM.
 
 ### Fonctionnalités
 
@@ -148,30 +148,23 @@ Ce dépôt contient une interface graphique (GUI) conçue pour contrôler et col
 ### Structure du projet
 
 - `main.py` : Script principal pour lancer l'interface graphique.
-- `ExportData.py` : Gère la fonctionnalité d'exportation des données, avec plusieurs versions (`v1` à `v4`) disponibles dans le répertoire `work_to_do` pour différentes implémentations.
-- `FenTracer.py` : Gère le traçage et la visualisation des données.
-- `test_plt_and_frame/` : Contient des scripts de test pour les tracés et la combinaison des cadres graphiques.
-  - `frame_side_by_side.py`, `update_graph.py` : Implémente et teste les tracés de données avec les interfaces de cadre.
-- `work_to_do/` : Contient des scripts en cours, tels que `transistor.py` et des fichiers icônes comme `icon_transistor.png`.
-- `Manuel_programmation_Keysight.pdf` : Un manuel de programmation pour le matériel Keysight utilisé dans le projet.
+- `Interface.py` : Contient la classe principale pour l'interface utilisateur, avec gestion de la connexion série à l'Arduino, l'envoi et la réception de données, et l'affichage des résultats.
+- `ImportExport.py` : Gère la fonctionnalité d'importation et d'exportation des données. Vous pouvez importer des fichiers `.txt` contenant des données pour les afficher ou exporter des données sous forme de fichiers texte.
 
+### Détails sur l'interface graphique
+L'interface graphique se compose des sections suivantes :
 
-### Utilisation
+1. **Connexions série avec Arduino** : Configurez les paramètres de communication (`port` et `baud rate`) et vérifiez la connexion avec l'Arduino. Un voyant de connexion indique si la connexion est établie ou non.
+2. **Écriture de données vers l'Arduino** : Envoyez des données numériques vers l'Arduino. Vous pouvez spécifier une ligne et une colonne à écrire.
+3. **Lecture des données depuis l'Arduino** : Lisez les données envoyées par l'Arduino après avoir spécifié la ligne et la colonne de lecture.
+4. **Importation et exportation des données** : Utilisez les menus pour importer ou exporter des fichiers `.txt` contenant des données. L'importation affichera les données dans une fenêtre pop-up, tandis que l'exportation enregistrera les données actuelles dans un fichier `.txt`.
 
-1. Exécuter le script `main.py` pour lancer la GUI :
-   ```bash
-   python main.py
-   ```
-
-2. Configurer les paramètres de la sonde en utilisant la GUI et surveiller le processus en temps réel grâce aux outils de traçage intégrés.
-
-3. Exporter les données des tests à l'aide du script `ExportData.py` ou de l'une de ses versions disponibles pour une fonctionnalité personnalisée.
-
-### Contribution
+---
+## Contribution
 
 N'hésitez pas à contribuer en soumettant des demandes de modification pour améliorer la fonctionnalité ou ajouter de nouvelles caractéristiques au Probe Station GUI.
 
-### Licence
+## Licence
 
 Ce projet est sous licence MIT - voir le fichier LICENSE pour plus de détails.
 
