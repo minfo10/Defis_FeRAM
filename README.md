@@ -138,14 +138,7 @@ Le projet inclut plusieurs programmes spécialisés :
 
 L'interface graphique (GUI) est conçue pour pour caractériser des dispositifs FeRAM. La GUI permet aux utilisateurs d'envoyer et recevoir les données que l'on souhaite au travers de la mémoire FeRAM.
 
-### Fonctionnalités
-
-- **Contrôle automatisé de la station de sondage** : Gérez les mouvements des sondes avec des configurations précises.
-- **Visualisation des données en temps réel** : Tracez et affichez les données des tests.
-- **Fonction d'exportation de données** : Exportez les données pour des analyses supplémentaires, avec plusieurs versions de scripts disponibles.
-- **Conception modulaire** : La structure du code permet une modification et une extension faciles.
-
-### Structure du projet
+### Structure
 
 - `main.py` : Script principal pour lancer l'interface graphique.
 - `Interface.py` : Contient la classe principale pour l'interface utilisateur, avec gestion de la connexion série à l'Arduino, l'envoi et la réception de données, et l'affichage des résultats.
