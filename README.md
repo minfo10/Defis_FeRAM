@@ -48,11 +48,25 @@ Nous allons utiliser ces bibliothèques Python :
    - Lancer l'IDE Arduino en ouvrant le fichier `.ino`.
    - Regarder le `baudrate` et le `port`.
    - Compiler et téléverser sur votre carte Arduino.
-   
-3. **Installer les dépendances Python** :
+
+3. **Créer un environnement virtuel Python**
+   - Pour Windows :
    ```bash
    cd ..
    cd ..
+   python3 -m venv env #Créez un environnement virtuel Python
+   .\env\Scripts\activate #Activez l'environnement virtuel
+   ```
+   - Pour Linux/MacOS :
+   ```bash
+   cd ..
+   cd ..
+   python3 -m venv env #Créez un environnement virtuel Python
+   source env/bin/activate #Activez l'environnement virtuel
+   ```
+   
+4. **Installer les dépendances Python** :
+   ```bash
    pip install -r requirements.txt
    ```
    Si vous avez une erreur avec `tkinter`, il se peut que vous deviez installer Python avec `tkinter` inclus. Vous pouvez vérifier si `tkinter` est installé avec cette commande :
@@ -61,18 +75,8 @@ Nous allons utiliser ces bibliothèques Python :
    ```
    Si cela ouvre une fenêtre avec le message "This is Tk", vous avez `tkinter` installé. Sinon, vous devrez peut-être installer ou réinstaller Python en vous assurant que `tkinter` est inclus.
    
-4. **Exécutez le programme `main.py` avec Python** :
-   - Pour Windows :
+5. **Exécutez le programme `main.py` avec Python** :
    ```bash
-   python3 -m venv env #Créez un environnement virtuel Python
-   .\env\Scripts\activate #Activez l'environnement virtuel
-   cd user_interface
-   python main.py
-   ```
-   - Pour Linux/MacOS :
-   ```bash
-   python3 -m venv env #Créez un environnement virtuel Python
-   source env/bin/activate #Activez l'environnement virtuel
    cd user_interface
    python main.py
    ```
