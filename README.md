@@ -50,41 +50,41 @@ Pour garantir une meilleure efficacité, le programme n'utilise pas les fonction
 Le microcontrôleur d'une carte Arduino est divisé en ports, chacun responsable d'un groupe de pins.
 Les cartes de type Arduino UNO disposent de trois principaux ports numériques :
 
-- Port D : Contrôle les pins numériques 0 à 7.
-- Port B : Contrôle les pins numériques 8 à 13.
-- Port C : Contrôle les pins analogiques (A0 à A5).
+- `Port D` : Contrôle les pins numériques 0 à 7.
+- `Port B` : Contrôle les pins numériques 8 à 13.
+- `Port C` : Contrôle les pins analogiques (`A0` à `A5`).
 Chaque port est constitué de trois registres binaires (8 bits chacun) :
 
-PORTx : Utilisé pour écrire (changer l'état) sur les pins.
-- PINx : Utilisé pour lire l'état des pins.
-- DDRx : Définit si les pins sont en entrée ou en sortie (Data Direction Register).
+- `PORTx` : Utilisé pour écrire (changer l'état) sur les pins.
+- `PINx` : Utilisé pour lire l'état des pins.
+- `DDRx` : Définit si les pins sont en entrée ou en sortie (Data Direction Register).
 
 | Exemple : État des pins d'un port
-| Si les pins numériques 1 et 3 sont à l'état haut (HIGH) et les autres pins du port D sont à l'état bas (LOW), la valeur du registre PORTD sera :
-| 0101 0000 (en binaire).
+| Si les pins numériques 1 et 3 sont à l'état haut (`HIGH`) et les autres pins du port D sont à l'état bas (`LOW`), la valeur du registre PORTD sera :
+| `0101 0000` (en binaire).
 | 
 | Remarque : L'ordre des bits est inversé. Le bit de poids faible (le dernier à droite) correspond au pin 0, tandis que le bit de poids fort (le premier à gauche) correspond au pin 7.
 
 ### Opérations binaires pour manipuler les pins
 
 
-Passage à l'état haut (HIGH)
-Pour mettre un pin à l'état haut, on utilise une opération OU inclusif (OR) sur le registre correspondant :
-|     0101 0000  (valeur actuelle du registre PORTD)
+Passage à l'état haut (`HIGH`)
+Pour mettre un pin à l'état haut, on utilise une opération OU inclusif (`OR`) sur le registre correspondant :
+|     0101 0000  (valeur actuelle du registre `PORTD`)
 | OU  0000 0100  (bit correspondant au pin 5)
 | =   0101 0100  (le pin 5 est maintenant à l'état haut)
 
 
-Passage à l'état bas (LOW)
-Pour mettre un pin à l'état bas, on utilise une opération ET NON (AND NOT) :
-|        0101 0100  (valeur actuelle du registre PORTD)
+Passage à l'état bas (`LOW`)
+Pour mettre un pin à l'état bas, on utilise une opération ET NON (`AND NOT`) :
+|        0101 0100  (valeur actuelle du registre `PORTD`)
 | ET NON 0000 0100  (bit correspondant au pin 5)
 | =      0101 0000  (le pin 5 est maintenant à l'état bas)
 
 
 Lecture de l'état d'un pin
-Pour lire l'état d'un pin, on effectue une opération ET (AND) sur le registre correspondant, puis on interprète le résultat :
-|     0101 0000  (valeur actuelle du registre PIND)
+Pour lire l'état d'un pin, on effectue une opération ET (`AND`) sur le registre correspondant, puis on interprète le résultat :
+|     0101 0000  (valeur actuelle du registre `PIND`)
 | ET  0100 0000  (bit correspondant au pin 6)
 | =   0100 0000  (résultat non nul : le pin 6 est à l'état haut)
 
@@ -92,19 +92,19 @@ Pour lire l'état d'un pin, on effectue une opération ET (AND) sur le registre 
 Fonctions utilitaires
 Pour simplifier la manipulation des ports, trois fonctions de base ont été définies :
 
-- byte myByte = BpON(pin) : Passe le pin spécifié à l'état haut.
-- byte myByte = BpOFF(pin) : Passe le pin spécifié à l'état bas.
-- byte myByte = Blect(pin) : Lit l'état d'un pin et retourne 1 (haut) ou 0 (bas).
+- `pON(pin)` : Passe le pin spécifié à l'état haut.
+- `pOFF(pin)` : Passe le pin spécifié à l'état bas.
+- `lect(pin)` : Lit l'état d'un pin et retourne 1 (haut) ou 0 (bas).
 Ces fonctions permettent d'encapsuler les opérations binaires tout en offrant une interface claire pour l'utilisateur.
 
 
 ### Programmes Arduino disponibles
 Le projet inclut plusieurs programmes spécialisés :
 
-byte myByte = Barduino_read : Programme dédié à la lecture d'une ligne complète dans la mémoire.
-byte myByte = Barduino_write : Programme dédié à l'écriture d'une ligne complète.
-byte myByte = Barduino_simul : Programme simulant le comportement d'une mémoire FeRAM.
-byte myByte = Barduino_general : Programme principal combinant les fonctionnalités de lecture et d'écriture.
+`arduino_read` : Programme dédié à la lecture d'une ligne complète dans la mémoire.
+`arduino_write` : Programme dédié à l'écriture d'une ligne complète.
+`arduino_simul` : Programme simulant le comportement d'une mémoire FeRAM.
+`arduino_general` : Programme principal combinant les fonctionnalités de lecture et d'écriture.
 
 
 ---
