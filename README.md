@@ -2,9 +2,8 @@
 
 ## Sommaire
 
-- [Arduino](#Arduino)
-
-- [Interface utilisateur](user_interface)
+- [Arduino](##Arduino)
+- [Interface utilisateur](##Interface-utilisateur)
 
 ## Pré-requis
 
@@ -12,8 +11,9 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants installés sur 
 
 - **Python 3.x** : Assurez-vous d'avoir une version récente de Python. Vous pouvez le télécharger depuis [python.org](https://www.python.org/downloads/).
 - **get-pip** : Utilisez `get-pip.py` pour installer `pip`, le gestionnaire de packages Python.
+- **Arduino IDE** : Téléchargez et installez l'[IDE Arduino](https://www.arduino.cc/en/software).
 
-Nous allons utiliser ces librairies :
+Nous allons utiliser ces bibliothèques Python :
 - **PyQt5** : Bibliothèque pour la création d'interfaces graphiques.
 - **Numpy** : Pour le calcul numérique et la gestion de tableaux.
 - **PySerial** : Pour la communication série avec des appareils.
@@ -21,85 +21,91 @@ Nous allons utiliser ces librairies :
 - **zeroconf** : Pour la découverte automatique de services sur un réseau local. 
 - **pyvisa** : Pour contrôler des instruments de mesure via des interfaces VISA.
 
-
 ## Installation
 
-1. Cloner le dépôt :
+1. **Cloner le dépôt** :
+   Clonez le projet localement en utilisant la commande suivante :
    ```bash
    git clone https://github.com/minfo10/Defis_FeRAM.git
+   cd Defis_FeRAM
    ```
-
-2. Installer les dépendances requises :
+2. **Installer les dépendances Python** : Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
    ```bash
+   python -m venv env
+   source env/bin/activate   # Sous Windows : env\Scripts\activate
    pip install -r requirements.txt
    ```
 
 ## Arduino
 
-Ce programme permet d'écrire et de lire une ligne complète de la carte mémoire.
+### Objectif du Programme
 
-### Changement de l'état d'un pin - Manipulation directe des ports de la carte Arduino
-Afin de gagner en efficacité et en temps de calcul, ce programme n'utilise pas les fonctions de base pour changer l'état des pins de la carte (digitalRead et digitalWrite) mais manipule directement ses ports.
+Ce programme permet d'effectuer des opérations de lecture et d'écriture sur une mémoire FeRAM, en utilisant une carte Arduino.
+Le code est optimisé pour manipuler directement les registres matériels des ports afin de réduire le temps de calcul et d'améliorer les performances.
 
-#### Ports et registres
-Les microcontrolleurs intégrés aux cartes arduinos sont composés de 3 ports :
-- le port **D** est responsable des **pins numériques 0 à 7**;
-- le port **B** est responsable des **pins numériques 8 à 13**;
-- le port **B** est responsable des **pins analogiques**.
+#### Manipulation directe des ports Arduino
+Pour garantir une meilleure efficacité, le programme n'utilise pas les fonctions standard digitalRead et digitalWrite pour accéder aux pins. À la place, il manipule directement les ports du microcontrôleur intégré, en interagissant avec leurs registres internes.
 
-Chaque port est lui-même composé de 3 registres à décalages (concrètement 3 variables bianaires appelées dans le code).
-- Le registre **PORT*** permet le changement de l'état d'un pin;
-- Le registre **PIN*** permet la lecture de l'état d'un pin.
+### Théorie : Ports et registres du microcontrôleur
+Le microcontrôleur d'une carte Arduino est divisé en ports, chacun responsable d'un groupe de pins.
+Les cartes de type Arduino UNO disposent de trois principaux ports numériques :
 
-##### Exemple
-Si les pins numériques **1** et **3** sont à l'état haut et les pins **0**, **2**, **4**, **5**, **6** et **7** sont à l'état bas, on aura :
-```
-PIND = 0101 0000 = PORTD
-```
-Attention à l'ordre de lecture ! Le bit de poids faible code ici l'état du pin 7 et non celui du pin 0.
+- Port D : Contrôle les pins numériques 0 à 7.
+- Port B : Contrôle les pins numériques 8 à 13.
+- Port C : Contrôle les pins analogiques (A0 à A5).
+Chaque port est constitué de trois registres binaires (8 bits chacun) :
 
-Pour plus d'informations, cf https://docs.arduino.cc/retired/hacking/software/PortManipulation/.
+PORTx : Utilisé pour écrire (changer l'état) sur les pins.
+- PINx : Utilisé pour lire l'état des pins.
+- DDRx : Définit si les pins sont en entrée ou en sortie (Data Direction Register).
+
+| Exemple : État des pins d'un port
+| Si les pins numériques 1 et 3 sont à l'état haut (HIGH) et les autres pins du port D sont à l'état bas (LOW), la valeur du registre PORTD sera :
+| 0101 0000 (en binaire).
+| 
+| Remarque : L'ordre des bits est inversé. Le bit de poids faible (le dernier à droite) correspond au pin 0, tandis que le bit de poids fort (le premier à gauche) correspond au pin 7.
+
+### Opérations binaires pour manipuler les pins
 
 
-#### Passage à l'état haut
-Il est donc possible de passer l'état d'un pin de l'état bas à l'état haut en appliquant l'opération arithmétique binaire **OU inclusif** à la variable **PORT***.
+Passage à l'état haut (HIGH)
+Pour mettre un pin à l'état haut, on utilise une opération OU inclusif (OR) sur le registre correspondant :
+|     0101 0000  (valeur actuelle du registre PORTD)
+| OU  0000 0100  (bit correspondant au pin 5)
+| =   0101 0100  (le pin 5 est maintenant à l'état haut)
 
-##### Exemple
-On reprend l'exemple précédent. On souhaite passer le pin 5 à l'état haut.
 
-```
-    0101 0000 
-OU  0000 0100
-=   0101 0100
-```
+Passage à l'état bas (LOW)
+Pour mettre un pin à l'état bas, on utilise une opération ET NON (AND NOT) :
+|        0101 0100  (valeur actuelle du registre PORTD)
+| ET NON 0000 0100  (bit correspondant au pin 5)
+| =      0101 0000  (le pin 5 est maintenant à l'état bas)
 
-#### Passage à l'état bas
-De la même façon, il est possible de passer l'état d'un pin de l'état haut à l'état bas en appliquant l'opération arithmétique binaire **ET NON** à la variable **PORT***.
 
-##### Exemple
-On reprend l'exemple précédent. On souhaite passer le pin 5 à l'état bas.
+Lecture de l'état d'un pin
+Pour lire l'état d'un pin, on effectue une opération ET (AND) sur le registre correspondant, puis on interprète le résultat :
+|     0101 0000  (valeur actuelle du registre PIND)
+| ET  0100 0000  (bit correspondant au pin 6)
+| =   0100 0000  (résultat non nul : le pin 6 est à l'état haut)
 
-```
-        0101 0100 
-ET NON  0000 0100 
-=       0101 0000
-```
-#### Lecture d'un pin
-Pour lire l'état d'un pin, il suffit d'isoler sa valeur en appliquant l'opération arithmétique binaire **ET** à la variable **PIN*** puis d'interpréter le résultat (nul ou non).
+### Implémentation
+Fonctions utilitaires
+Pour simplifier la manipulation des ports, trois fonctions de base ont été définies :
 
-##### Exemple
-Lecture du pin 1.
+- byte myByte = BpON(pin) : Passe le pin spécifié à l'état haut.
+- byte myByte = BpOFF(pin) : Passe le pin spécifié à l'état bas.
+- byte myByte = Blect(pin) : Lit l'état d'un pin et retourne 1 (haut) ou 0 (bas).
+Ces fonctions permettent d'encapsuler les opérations binaires tout en offrant une interface claire pour l'utilisateur.
 
-```
-    0101 0000 
-ET  0100 0000
-=   0100 0000
-=   64
-=/= 0
-```
 
-#### Implémentation
-Ainsi, pour lire ou écrire l'état d'un pin, le programe appelle les fonctions **pON** (passage à l'état haut), **pOFF** (passage à l'état bas) et **lect** définies en entête du code.
+### Programmes Arduino disponibles
+Le projet inclut plusieurs programmes spécialisés :
+
+byte myByte = Barduino_read : Programme dédié à la lecture d'une ligne complète dans la mémoire.
+byte myByte = Barduino_write : Programme dédié à l'écriture d'une ligne complète.
+byte myByte = Barduino_simul : Programme simulant le comportement d'une mémoire FeRAM.
+byte myByte = Barduino_general : Programme principal combinant les fonctionnalités de lecture et d'écriture.
+
 
 ---
 
