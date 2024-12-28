@@ -2,8 +2,8 @@
 
 ## Sommaire
 
-- [Arduino](##Arduino)
-- [Interface utilisateur](##Interface-utilisateur)
+- [Arduino](#Arduino)
+- [Interface utilisateur](#Interface-utilisateur)
 
 ## Pré-requis
 
