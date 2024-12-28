@@ -50,22 +50,24 @@ Nous allons utiliser ces bibliothèques Python :
    - Compiler et téléverser sur votre carte Arduino.
 
 3. **Créer et activer un environnement virtuel Python**
+
+   La création d'un environnement virtuel Python peut prendre un peu de temps. Si jamais cela dépasse 2mins, il se peut que vous ayez déjà un environnement fonctionnel donc faites CRTL+C et passez à la suite.
    - Pour Windows :
    ```bash
    cd ..
    cd ..
-   python -m venv env #Créez un environnement virtuel Python (peut prendre un peu de temps)
+   python -m venv env #Créez un environnement virtuel Python
    .\env\Scripts\activate #Activez l'environnement virtuel
    ```
    - Pour Linux/MacOS :
    ```bash
    cd ..
    cd ..
-   python3 -m venv env #Créez un environnement virtuel Python (peut prendre un peu de temps)
+   python3 -m venv env #Créez un environnement virtuel Python
    source env/bin/activate #Activez l'environnement virtuel
    ```
    
-4. **Installer les dépendances Python** :
+5. **Installer les dépendances Python** :
    ```bash
    pip install -r requirements.txt
    ```
@@ -75,7 +77,7 @@ Nous allons utiliser ces bibliothèques Python :
    ```
    Si cela ouvre une fenêtre avec le message "This is Tk", vous avez `tkinter` installé. Sinon, vous devrez peut-être installer ou réinstaller Python en vous assurant que `tkinter` est inclus.
    
-5. **Exécutez le programme `main.py` avec Python** :
+6. **Exécutez le programme `main.py` avec Python** :
    ```bash
    cd user_interface
    python main.py
