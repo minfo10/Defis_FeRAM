@@ -24,12 +24,11 @@ Nous allons utiliser ces bibliothèques Python :
 ## Installation
 
 1. **Cloner le dépôt** :
-   Clonez le projet localement en utilisant la commande suivante :
    ```bash
    git clone https://github.com/minfo10/Defis_FeRAM.git
    cd Defis_FeRAM
    ```
-2. **Installer les dépendances Python** : Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
+2. **Installer les dépendances Python** :
    ```bash
    python -m venv env
    source env/bin/activate   # Sous Windows : env\Scripts\activate
@@ -53,7 +52,7 @@ Nous allons utiliser ces bibliothèques Python :
    cd user_interface
    python main.py
    ```
-
+---
 ## Arduino
 
 ### Objectif du Programme
