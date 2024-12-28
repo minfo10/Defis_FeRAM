@@ -51,6 +51,8 @@ Nous allons utiliser ces bibliothèques Python :
    
 3. **Installer les dépendances Python** :
    ```bash
+   cd ..
+   cd ..
    pip install -r requirements.txt
    ```
    Si vous avez une erreur avec `tkinter`, il se peut que vous deviez installer Python avec `tkinter` inclus. Vous pouvez vérifier si `tkinter` est installé avec cette commande :
@@ -60,10 +62,6 @@ Nous allons utiliser ces bibliothèques Python :
    Si cela ouvre une fenêtre avec le message "This is Tk", vous avez `tkinter` installé. Sinon, vous devrez peut-être installer ou réinstaller Python en vous assurant que `tkinter` est inclus.
    
 4. **Exécutez le programme `main.py` avec Python** :
-   ```bash
-   cd ..
-   cd ..
-   ```
    - Pour Windows :
    ```bash
    python3 -m venv env #Créez un environnement virtuel Python
