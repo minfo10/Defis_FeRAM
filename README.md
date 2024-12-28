@@ -54,14 +54,14 @@ Nous allons utiliser ces bibliothèques Python :
    ```bash
    cd ..
    cd ..
-   python -m venv env #Créez un environnement virtuel Python
+   python -m venv env #Créez un environnement virtuel Python (peut prendre un peu de temps)
    .\env\Scripts\activate #Activez l'environnement virtuel
    ```
    - Pour Linux/MacOS :
    ```bash
    cd ..
    cd ..
-   python3 -m venv env #Créez un environnement virtuel Python
+   python3 -m venv env #Créez un environnement virtuel Python (peut prendre un peu de temps)
    source env/bin/activate #Activez l'environnement virtuel
    ```
    
