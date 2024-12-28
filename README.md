@@ -28,22 +28,40 @@ Nous allons utiliser ces bibliothèques Python :
    git clone https://github.com/minfo10/Defis_FeRAM.git
    cd Defis_FeRAM
    ```
-2. **Installer les dépendances Python** :
+2. **Créer et activer un environnement virtuel** :
+   - Créez un environnement virtuel Python :
    ```bash
-   python -m venv env
-   source env/bin/activate   # Sous Windows : env\Scripts\activate
+   python3 -m venv env
+   ```
+   - Activez l'environnement virtuel (Windows) :
+   ```bash
+   .\env\Scripts\activate
+   ```
+   - Activez l'environnement virtuel (Linux) :
+   ```bash
+   source env/bin/activate
+   ```
+4. **Installer les dépendances Python** :
+   ```bash
    pip install -r requirements.txt
    ```
+   Si vous avez une erreur avec `tkinter`, il se peut que vous deviez installer Python avec `tkinter` inclus. Vous pouvez vérifier si `tkinter` est installé avec cette commande :
+   ```bash
+   python -m tkinter
+   ```
+   Si cela ouvre une fenêtre avec le message "This is Tk", vous avez `tkinter` installé. Sinon, vous devrez peut-être installer ou réinstaller Python en vous assurant que `tkinter` est inclus.
    
 ## Utilisation
 
 1. **Téléverser le programme Arduino sur la carte moniteur** :
    ```bash
    cd Arduino/arduino_general
+   explorer . #Windows
+   nautilus . #GNOME (Ubuntu, Fedora...)
    ```
-   - Lancez l'IDE Arduino.
-   - Regardez le `baudrate` et le `port`.
-   - Compilez et téléversez sur votre carte Arduino.
+   - Lancer l'IDE Arduino en ouvrant le fichier `.ino`.
+   - Regarder le `baudrate` et le `port`.
+   - Compiler et téléverser sur votre carte Arduino.
 2. **Exécutez le programme `main.py` avec Python** :
    ```bash
    cd ..
