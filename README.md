@@ -29,9 +29,7 @@ Nous allons utiliser ces bibliothèques Python :
    git clone https://github.com/minfo10/Defis_FeRAM.git
    cd Defis_FeRAM
    ```
-2. **Installer les dépendances Python** :
-
-   Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
+2. **Installer les dépendances Python** : Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
    ```bash
    python -m venv env
    source env/bin/activate   # Sous Windows : env\Scripts\activate
@@ -44,7 +42,6 @@ Nous allons utiliser ces bibliothèques Python :
    ```bash
    cd Arduino/arduino_general
    ```
-   
    - Ensuite, il faut lancer l'IDE Arduino.
    - Le baud qui doit être réglé à 9600.
    - Compilez et téléversez sur votre carte.
