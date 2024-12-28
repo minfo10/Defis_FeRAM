@@ -41,10 +41,9 @@ Nous allons utiliser ces bibliothèques Python :
    ```bash
    cd Arduino/arduino_general
    ```
-   - Ensuite, il faut lancer l'IDE Arduino.
-   - Le baud qui doit être réglé à 9600.
-   - Compilez et téléversez sur votre carte.
-   - Notez par ailleurs le port où est branché la carte Arduino.
+   - Lancez l'IDE Arduino.
+   - Regardez le `baudrate` et le `port`.
+   - Compilez et téléversez sur votre carte Arduino.
 2. **Exécutez le programme `main.py` avec Python** :
    ```bash
    cd ..
