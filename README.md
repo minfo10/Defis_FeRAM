@@ -67,26 +67,29 @@ Si les pins numériques 1 et 3 sont à l'état haut (`HIGH`) et les autres pins 
 
 ### Opérations binaires pour manipuler les pins
 
-**Passage à l'état haut (`HIGH`)**
+- **Passage à l'état haut (`HIGH`)**
+
 Pour mettre un pin à l'état haut, on utilise une opération OU inclusif (`OR`) sur le registre correspondant :
    ```bash
-     0101 0000  (valeur actuelle du registre `PORTD`)
+        0101 0000  (valeur actuelle du registre `PORTD`)
  OU  0000 0100  (bit correspondant au pin 5)
  =   0101 0100  (le pin 5 est maintenant à l'état haut)
    ```
 
-**Passage à l'état bas (`LOW`)**
+- **Passage à l'état bas (`LOW`)**
+
 Pour mettre un pin à l'état bas, on utilise une opération ET NON (`AND NOT`) :
    ```bash
-        0101 0100  (valeur actuelle du registre `PORTD`)
+           0101 0100  (valeur actuelle du registre `PORTD`)
  ET NON 0000 0100  (bit correspondant au pin 5)
  =      0101 0000  (le pin 5 est maintenant à l'état bas)
    ```
 
-**Lecture de l'état d'un pin**
+- **Lecture de l'état d'un pin**
+
 Pour lire l'état d'un pin, on effectue une opération ET (`AND`) sur le registre correspondant, puis on interprète le résultat :
    ```bash
-     0101 0000  (valeur actuelle du registre `PIND`)
+        0101 0000  (valeur actuelle du registre `PIND`)
  ET  0100 0000  (bit correspondant au pin 6)
  =   0100 0000  (résultat non nul : le pin 6 est à l'état haut)
    ```
