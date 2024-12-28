@@ -21,27 +21,33 @@ Nous allons utiliser ces bibliothèques Python :
 - **zeroconf** : Pour la découverte automatique de services sur un réseau local. 
 - **pyvisa** : Pour contrôler des instruments de mesure via des interfaces VISA.
 
-## Installation
+## Installation et Utilisation
 
 1. **Cloner le dépôt** :
    ```bash
    git clone https://github.com/minfo10/Defis_FeRAM.git
    cd Defis_FeRAM
    ```
-2. **Créer et activer un environnement virtuel** :
-   - Créez un environnement virtuel Python :
+2. **Téléverser le programme Arduino sur la carte moniteur** :
+   - Pour Windows :
    ```bash
-   python3 -m venv env
+   cd Arduino/arduino_general
+   explorer .
    ```
-   - Activez l'environnement virtuel (Windows) :
+   - Pour GNOME (Ubuntu, Fedora...) :
    ```bash
-   .\env\Scripts\activate
+   cd Arduino/arduino_general
+   nautilus .open .
    ```
-   - Activez l'environnement virtuel (Linux) :
+   - Pour MacOS :
    ```bash
-   source env/bin/activate
+   cd Arduino/arduino_general
+   open .
    ```
-4. **Installer les dépendances Python** :
+   - Lancer l'IDE Arduino en ouvrant le fichier `.ino`.
+   - Regarder le `baudrate` et le `port`.
+   - Compiler et téléverser sur votre carte Arduino.
+3. **Installer les dépendances Python** :
    ```bash
    pip install -r requirements.txt
    ```
@@ -50,22 +56,22 @@ Nous allons utiliser ces bibliothèques Python :
    python -m tkinter
    ```
    Si cela ouvre une fenêtre avec le message "This is Tk", vous avez `tkinter` installé. Sinon, vous devrez peut-être installer ou réinstaller Python en vous assurant que `tkinter` est inclus.
-   
-## Utilisation
-
-1. **Téléverser le programme Arduino sur la carte moniteur** :
+4. **Exécutez le programme `main.py` avec Python** :
    ```bash
-   cd Arduino/arduino_general
-   explorer . #Windows
-   nautilus . #GNOME (Ubuntu, Fedora...)
+   cd ..
+   cd ..
    ```
-   - Lancer l'IDE Arduino en ouvrant le fichier `.ino`.
-   - Regarder le `baudrate` et le `port`.
-   - Compiler et téléverser sur votre carte Arduino.
-2. **Exécutez le programme `main.py` avec Python** :
+   - Pour Windows :
    ```bash
-   cd ..
-   cd ..
+   python3 -m venv env #Créez un environnement virtuel Python
+   .\env\Scripts\activate #Activez l'environnement virtuel
+   cd user_interface
+   python main.py
+   ```
+   - Pour Linux/MacOS :
+   ```bash
+   python3 -m venv env #Créez un environnement virtuel Python
+   source env/bin/activate #Activez l'environnement virtuel
    cd user_interface
    python main.py
    ```
