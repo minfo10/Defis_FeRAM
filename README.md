@@ -46,6 +46,12 @@ Le code est optimisé pour manipuler directement les registres matériels des po
 #### Manipulation directe des ports Arduino
 Pour garantir une meilleure efficacité, le programme n'utilise pas les fonctions standard digitalRead et digitalWrite pour accéder aux pins. À la place, il manipule directement les ports du microcontrôleur intégré, en interagissant avec leurs registres internes.
 
+    0101 0000 |
+               |
+    0100 0000 } Exemple d'état des pins
+               |
+    0000 0000 |
+    
 ### Théorie : Ports et registres du microcontrôleur
 Le microcontrôleur d'une carte Arduino est divisé en ports, chacun responsable d'un groupe de pins.
 Les cartes de type Arduino UNO disposent de trois principaux ports numériques :
@@ -53,6 +59,7 @@ Les cartes de type Arduino UNO disposent de trois principaux ports numériques :
 - `Port D` : Contrôle les pins numériques 0 à 7.
 - `Port B` : Contrôle les pins numériques 8 à 13.
 - `Port C` : Contrôle les pins analogiques (`A0` à `A5`).
+
 Chaque port est constitué de trois registres binaires (8 bits chacun) :
 
 - `PORTx` : Utilisé pour écrire (changer l'état) sur les pins.
