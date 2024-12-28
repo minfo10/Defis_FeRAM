@@ -29,7 +29,9 @@ Nous allons utiliser ces bibliothèques Python :
    git clone https://github.com/minfo10/Defis_FeRAM.git
    cd Defis_FeRAM
    ```
-2. **Installer les dépendances Python** : Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
+2. **Installer les dépendances Python** :
+
+   Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
    ```bash
    python -m venv env
    source env/bin/activate   # Sous Windows : env\Scripts\activate
@@ -38,14 +40,15 @@ Nous allons utiliser ces bibliothèques Python :
    
 ## Utilisation
 
-1. **Téléverser le programme Arduino sur la carte moniteur** : Assurez-vous d'utiliser un environnement virtuel (optionnel mais recommandé) pour isoler les dépendances :
+1. **Téléverser le programme Arduino sur la carte moniteur** :
    ```bash
    cd Arduino/arduino_general
    ```
-   Ensuite, il faut lancer l'IDE Arduino.
-   Le baud qui doit être réglé à 9600.
-   Compilez et téléversez sur votre carte.
-   Notez par ailleurs le port où est branché la carte Arduino.
+   
+   - Ensuite, il faut lancer l'IDE Arduino.
+   - Le baud qui doit être réglé à 9600.
+   - Compilez et téléversez sur votre carte.
+   - Notez par ailleurs le port où est branché la carte Arduino.
 2. **Exécutez le programme `main.py` avec Python** :
    ```bash
    cd ..
