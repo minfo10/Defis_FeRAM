@@ -28,6 +28,7 @@ Nous allons utiliser ces bibliothèques Python :
    git clone https://github.com/minfo10/Defis_FeRAM.git
    cd Defis_FeRAM
    ```
+   
 2. **Téléverser le programme Arduino sur la carte moniteur** :
    - Pour Windows :
    ```bash
@@ -47,6 +48,7 @@ Nous allons utiliser ces bibliothèques Python :
    - Lancer l'IDE Arduino en ouvrant le fichier `.ino`.
    - Regarder le `baudrate` et le `port`.
    - Compiler et téléverser sur votre carte Arduino.
+   
 3. **Installer les dépendances Python** :
    ```bash
    pip install -r requirements.txt
@@ -56,6 +58,7 @@ Nous allons utiliser ces bibliothèques Python :
    python -m tkinter
    ```
    Si cela ouvre une fenêtre avec le message "This is Tk", vous avez `tkinter` installé. Sinon, vous devrez peut-être installer ou réinstaller Python en vous assurant que `tkinter` est inclus.
+   
 4. **Exécutez le programme `main.py` avec Python** :
    ```bash
    cd ..
