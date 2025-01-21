@@ -1,6 +1,6 @@
 #include <math.h>
 
-// *** Déclaration des broches ***
+// *** Declaration of PINs ***
 // Assumes Arduino UNO-like board
 const int WB = A0;           // Write Back
 const int SA = A1;           // Sense Amplifier
@@ -12,9 +12,10 @@ const int SET_PARA = 6;      // Set Parallel
 const int CLOCK = 7;         // Clock
 const int SC_IN = 8;         // Scan Chain IN
 const int SC_OUT = 9;        // Scan Chain OUT
-const int SC_SEL_ZERO = 10;  // Scan Chain Select 0
-const int SC_SEL_UN = 11;    // Scan Chain Select 1
+const int SC_SEL_ZERO = 10;  // Scan Chain Select 0 -> position x
+const int SC_SEL_UN = 11;    // Scan Chain Select 1 -> position y
 
+// *** Functions ***
 void affMenu(bool premAff);
 void ecriture();
 void lecture();
@@ -29,7 +30,9 @@ void zeroPara(int ligne);
 void unPara(int ligne);
 void zeroUnitaire();
 
+// *** Setup ***
 void setup() {
+  // Set all pins as OUTPUT or INPUT
   pinMode(WB, OUTPUT);
   pinMode(SA, OUTPUT);
   pinMode(SL, OUTPUT);
@@ -55,6 +58,7 @@ void setup() {
   digitalWrite(SC_SEL_ZERO, LOW);
   digitalWrite(SC_SEL_UN, LOW);
 
+  // Initialize Serial communication
   Serial.begin(9600);
   affMenu(true);
 }
@@ -62,9 +66,10 @@ void setup() {
 // *** Boucle principale : Interface utilisateur ***
 void loop() {
   if (Serial.available() > 0) {
-    String reponse = Serial.readStringUntil('\n');
-    int repInt = reponse.toInt();
+    String reponse = Serial.readStringUntil('\n'); // Lecture de la réponse
+    int repInt = reponse.toInt(); // Conversion en entier
 
+    //Serial.print("Réponse : ");
     switch (repInt) {
       case 1:
         ecriture();
@@ -104,15 +109,15 @@ void affMenu(bool premAff) {
 
 // *** Écriture dans la mémoire ***
 void ecriture() {
-  bool repValide = false;
-  uint8_t repByte = 0;
-  String reponse;
+  bool repValide = false; // Vérification de la validité de la réponse
+  uint8_t repByte = 0; // Octet à écrire
+  String reponse; // Réponse de l'utilisateur
 
   // 1. Obtenir un entier à écrire
   Serial.println("Entier non signé 8 bits (0 <= nb <= 255) à écrire :");
   while (!repValide) {
     while (!Serial.available())
-      ;
+      ; // Attendre une réponse
     reponse = Serial.readStringUntil('\n');
     repValide = testRepValide(reponse, 0, 255);
     if (repValide) {
@@ -136,6 +141,7 @@ void ecriture() {
 
 // *** Lecture de la mémoire ***
 void lecture() {
+  // Obtenir la position de la cellule à lire
   int ligne = obtenirPosition("Ligne ? (Entre 1 et 128)", 1, 128);
   int colonne = obtenirPosition("Colonne ? (Entre 1 et 16)", 1, 16);
 
@@ -296,6 +302,7 @@ void scWLSL(int ligne) {
   }
 }
 
+// *** Lecture d'une colonne ***
 int scOut() {
   // Sélection de la bonne Scan Chain
   digitalWrite(SC_SEL_ZERO, LOW);
@@ -304,7 +311,7 @@ int scOut() {
   int resultat = 0;
   for (int i = 0; i < 128; i++) {
     clk();
-    int bitVal = digitalRead(SC_OUT);
+    int bitVal = digitalRead(SC_OUT); // Lecture du bit
     if (bitVal == HIGH) {
       resultat += (int)pow(2, i);
     }
@@ -312,6 +319,7 @@ int scOut() {
   return resultat;
 }
 
+// *** Écriture d'une colonne ***
 void scBL(uint8_t repByte, int colonne) {
   if (colonne < 1 || colonne > 16) {
     Serial.println("Erreur : Colonne non valide. Valeur doit être entre 1 et 16.");
@@ -382,6 +390,7 @@ void zeroPara(int ligne) {
   clk();
 }
 
+// *** Schémas pour coder les 0 et 1 ***
 void unPara(int ligne) {
   scWLSL(ligne);
 
@@ -415,6 +424,7 @@ void unPara(int ligne) {
   clk();
 }
 
+// *** Schémas pour coder les 0 et 1 ***
 void zeroUnitaire() {
   digitalWrite(PRE, HIGH);
   clk();
