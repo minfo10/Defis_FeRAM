@@ -1,4 +1,0 @@
-voir chronogramme thèse
-
-clock : Simule un coup de clock. Il est important de noter ici que la carte à pointe prend en compte le changement d état de ses entrée uniquement quand elle reçoit un front montant sur le pin CLOCK. Le rapport cyclique du signal créneau envoyé n a donc aucune importance.
-
