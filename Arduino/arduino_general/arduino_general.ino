@@ -7,7 +7,7 @@ const int SA = A1;           // Sense Amplifier
 const int SL = 2;            // Source Line
 const int WL = 3;            // Word Line
 const int PRE = 4;           // Precharge
-const int BL = 5;            // Base Line
+const int BL = 5;            // Bit Line
 const int SET_PARA = 6;      // Set Parallel
 const int CLOCK = 7;         // Clock
 const int SC_IN = 8;         // Scan Chain IN
@@ -55,7 +55,7 @@ void setup() {
   digitalWrite(SC_SEL_ZERO, LOW);
   digitalWrite(SC_SEL_UN, LOW);
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   affMenu(true);
 }
 
@@ -86,9 +86,10 @@ void loop() {
 void clk() {
   // Simule un coup d'horloge.
   digitalWrite(CLOCK, HIGH);
-  delayMicroseconds(2);
+  delayMicroseconds(10);
   digitalWrite(CLOCK, LOW);
-  delayMicroseconds(2);
+  delayMicroseconds(10);
+  Serial.print("imp");
 }
 
 // *** Menu interactif ***
