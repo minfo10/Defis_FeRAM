@@ -68,7 +68,7 @@ class Interface(tk.Tk):
         ttk.Label(frame_connexion, text="Port de l'Arduino").grid(row=0, column=0, sticky="w", pady=5)
         ttk.Entry(frame_connexion, textvariable=self.port_com, justify='center', width=12).grid(row=0, column=1, padx=5)
 
-        ttk.Label(frame_connexion, text="Vitesse (baud rate)").grid(row=1, column=0, sticky="w", pady=5)
+        ttk.Label(frame_connexion, text="Baud rate)").grid(row=1, column=0, sticky="w", pady=5)
         ttk.Entry(frame_connexion, textvariable=self.baud_rate, justify='center', width=12).grid(row=1, column=1, padx=5)
 
         # Voyant de connexion       
@@ -136,7 +136,7 @@ class Interface(tk.Tk):
         ttk.Label(frame_read, text="Colonne ? (1-16)").grid(row=1, column=0, sticky='w', pady=5)
         ttk.Entry(frame_read, textvariable=self.rcolonne, justify='center', width=12).grid(row=1, column=1, padx=5)
 
-        ttk.Label(frame_read, text="Texte lu").grid(row=2, column=0, sticky='w', pady=5)
+        ttk.Label(frame_read, text="Entier lu").grid(row=2, column=0, sticky='w', pady=5)
         ttk.Entry(frame_read, textvariable=self.read, justify='center', width=12, state='readonly').grid(row=2, column=1, padx=5)
 
         # Bouton Recevoir
