@@ -58,7 +58,7 @@ void setup() {
   digitalWrite(SC_SEL_ZERO, LOW);
   digitalWrite(SC_SEL_UN, LOW);
 
-  Serial.begin(115200);
+  Serial.begin(2000000);
   affMenu(true);
 }
 
