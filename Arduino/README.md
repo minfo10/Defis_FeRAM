@@ -1,74 +1,31 @@
-voir chronogramme thèse
+Durant ce projet assez complexe en terme d'Arduino, nous avons dû séparer les tâches et fonctionner suivant plusieurs étapes :
+
+La première étant l'écriture et la lecture de PIN. Nous avons récupéré les programmes de l'ancienne équipe qui étaient basé sur les chronogrammes des thèses en bibliographie.
+La notion importante ici était le CLOCK - clk() : Elle permet de faire la différence entre un signal long ou court et savoir quand la détection de signal sur les autres ports se fait pour pouvoir retirer des informations.
 
 clock : Simule un coup de clock. Il est important de noter ici que la carte à pointe prend en compte le changement d état de ses entrée uniquement quand elle reçoit un front montant sur le pin CLOCK. Le rapport cyclique du signal créneau envoyé n a donc aucune importance.
 
-Ancien README de la première équipe 
 
+Les deux premiers programmes créés sont donc : 
+- **arduino_read**
+- **arduino_write**
 
-# Défis d'IPhy - Mémoires du futur
+L'équipe de cette année a commencé par créer **arduino_general** qui est la fusion de **arduino_read** et **arduino_write** avec les chronogrammes de l'ancienne équipe.
+Ce travail de fusion a permi de faire plusieurs chose :
+- un menu interractif dans le serial monitor pour savoir si on veut écrire ou lire
+- précision de la **line** et de la **column**
+- introduction de la **value** à écrire
 
-Ce programme permet d'écrire et de lire une ligne complète de la carte mémoire.
+Ensuite, le programme va transformer cette **value** en byte puis en séquence de 0 et de 1 sur les différents PIN des PORTS.
 
-## Changement de l'état d'un pin - Manipulation directe des ports de la carte Arduino
-Afin de gagner en efficacité et en temps de calcul, ce programme n'utilise pas les fonctions de base pour changer l'état des pins de la carte (digitalRead et digitalWrite) mais manipule directement ses ports.
+Il est maintenant question de savoir si notre programme marche vraiment ou non !
+Première tentative : **arduino_simul**
+C'est surtout un programme test qui nous a permi de mieux comprendre comment les opérations d'écriture étaient effectuées au sein de la carte Arduino.
 
-### Ports et registres
-Les microcontrolleurs intégrés aux cartes arduinos sont composés de 3 ports :
-- le port **D** est responsable des **pins numériques 0 à 7**;
-- le port **B** est responsable des **pins numériques 8 à 13**;
-- le port **B** est responsable des **pins analogiques**.
+Les signaux qui peuvent être envoyé depuis la carte Arduino sont très rapides mais ceux lu par la carte sont lent à cause des fonctions internes de la carte Arduino.
+Il faut passer par une lecture suivant les PORTs et non PIN par PIN (on prend toute une série de PIN qu'on lit simultanément). Ceci nous a permi de lire jusq'à 49 clocks sur les 128 envoyés (ce qui est une grosse évolution par rapport aux 4 ou 5 clock reçu en mode séquentiel.
+Cette version avec la lecture des ports en simultané avait été proposée l'année passée mais dont l'implémentation était assez étrange.
+- **acquisition_unit** est un programme qui permet de tester combien de **clk()** on peut observer sur une opération de lecture / écriture
+- **arduino_simul2** est un programme qui essaie de lire les informations reçu par la carte arduino de lecture / écriture
 
-Chaque port est lui-même composé de 3 registres à décalages (concrètement 3 variables bianaires appelées dans le code).
-- Le registre **PORT*** permet le changement de l'état d'un pin;
-- Le registre **PIN*** permet la lecture de l'état d'un pin.
-
-#### Exemple
-Si les pins numériques **1** et **3** sont à l'état haut et les pins **0**, **2**, **4**, **5**, **6** et **7** sont à l'état bas, on aura :
-```
-PIND = 0101 0000 = PORTD
-```
-Attention à l'ordre de lecture ! Le bit de poids faible code ici l'état du pin 7 et non celui du pin 0.
-
-Pour plus d'informations, cf https://docs.arduino.cc/retired/hacking/software/PortManipulation/.
-
-
-### Passage à l'état haut
-Il est donc possible de passer l'état d'un pin de l'état bas à l'état haut en appliquant l'opération arithmétique binaire **OU inclusif** à la variable **PORT***.
-
-#### Exemple
-On reprend l'exemple précédent. On souhaite passer le pin 5 à l'état haut.
-
-```
-    0101 0000 
-OU  0000 0100
-=   0101 0100
-```
-
-### Passage à l'état bas
-De la même façon, il est possible de passer l'état d'un pin de l'état haut à l'état bas en appliquant l'opération arithmétique binaire **ET NON** à la variable **PORT***.
-
-#### Exemple
-On reprend l'exemple précédent. On souhaite passer le pin 5 à l'état bas.
-
-```
-        0101 0100 
-ET NON  0000 0100 
-=       0101 0000
-```
-### Lecture d'un pin
-Pour lire l'état d'un pin, il suffit d'isoler sa valeur en appliquant l'opération arithmétique binaire **ET** à la variable **PIN*** puis d'interpréter le résultat (nul ou non).
-
-#### Exemple
-Lecture du pin 1.
-
-```
-    0101 0000 
-ET  0100 0000
-=   0100 0000
-=   64
-=/= 0
-```
-
-### Implémentation
-Ainsi, pour lire ou écrire l'état d'un pin, le programe appelle les fonctions **pON** (passage à l'état haut), **pOFF** (passage à l'état bas) et **lect** définies en entête du code.
-
+Nous avons récement découvert la fonction *captures[N]* qui permet de stocker les N différents signaux lus par la carte Arduino, avec un *Buffer circulaire*, on peut effacer les anciennes données lues pour mettre les plus récentes. Cette version permet une lecture dynamique et rapide tout en permettant le stockage des signaux. C'est le programme **arduino_simul3**.
