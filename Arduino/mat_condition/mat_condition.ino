@@ -1,5 +1,5 @@
-const int numSignals = 1;  // Nombre de bits
-const int signalPins[numSignals] = {2};  // Exemple avec 8 pins définis
+const int numSignals = 2;  // Nombre de bits
+const int signalPins[numSignals] = {2,3};  // Exemple avec 8 pins définis
 const int clockInterval = 10;  // Intervalle de l'horloge en ms
 unsigned long lastClock = 0;  // Dernière mise à jour du clock
 
@@ -11,11 +11,11 @@ bool accessGranted(int col) {
     if (col < 0 || col >= 4) return false;  // Vérifie si la colonne est valide
 
     for (int i = 1; i < numSignals; i++) {
-        if (digitalRead(signalPins[i]) == HIGH) { // Si un signal est OFF, refus*
-            Serial.print("Pin");
-            Serial.print(i);
-            return false;
-        }
+      if(digitalRead(signalPins[i]) == HIGH){ // Si un signal est OFF, refus*
+        Serial.print("Pin ");
+        Serial.print(i);
+        Serial.print(" ouvert\n");
+      }
     }
     return true;
 }
@@ -30,6 +30,7 @@ void setMemoryValue(int row, int col, int value) {
         Serial.print(col);
         Serial.print(") -> ");
         Serial.println(value, BIN);  // Affichage en binaire
+        Serial.print("\n");
     } else {
         Serial.println("Accès refusé : Signaux insuffisants !");
     }
@@ -78,13 +79,11 @@ void loop() {
         command.trim();
 
         if (command.startsWith("SET")) {
-            Serial.print("1");
             // Format attendu : SET ligne colonne valeur
             int row, col, value;
             if (sscanf(command.c_str(), "SET %d %d %d", &row, &col, &value) == 3) {
                 setMemoryValue(row, col, value);
-                
-                Serial.print("1");
+              
             } else {
                 Serial.println("Commande invalide. Format : SET ligne colonne valeur");
             }
