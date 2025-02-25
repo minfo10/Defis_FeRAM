@@ -1,74 +1,44 @@
-voir chronogramme thèse
+# Projet Arduino
 
-clock : Simule un coup de clock. Il est important de noter ici que la carte à pointe prend en compte le changement d état de ses entrée uniquement quand elle reçoit un front montant sur le pin CLOCK. Le rapport cyclique du signal créneau envoyé n a donc aucune importance.
+## Fonctionnement Général
+L'objectif principal est de gérer l'écriture et la lecture sur les PINs de l'Arduino en utilisant un signal d'horloge (**CLOCK - clk()**) pour synchroniser les opérations. La carte ne prend en compte les changements d'état de ses entrées qu'à la réception d'un front montant sur le PIN CLOCK, rendant le rapport cyclique du signal créneau envoyé sans importance.
 
-Ancien README de la première équipe 
+## Développement des Programmes
 
+Durant ce projet, nous avons dû séparer les tâches et fonctionner suivant plusieurs étapes :
 
-# Défis d'IPhy - Mémoires du futur
+### 1. Premiers Programmes
+- **arduino_read** : Gestion de la lecture des données.
+- **arduino_write** : Gestion de l'écriture des données.
 
-Ce programme permet d'écrire et de lire une ligne complète de la carte mémoire.
+Ces programmes étaient issus des travaux de l'ancienne équipe.
 
-## Changement de l'état d'un pin - Manipulation directe des ports de la carte Arduino
-Afin de gagner en efficacité et en temps de calcul, ce programme n'utilise pas les fonctions de base pour changer l'état des pins de la carte (digitalRead et digitalWrite) mais manipule directement ses ports.
+### 2. Fusion et Optimisation
+- **arduino_general** : Fusion des programmes **arduino_read** et **arduino_write**.
+  - Création d'un menu interactif dans le Serial Monitor permettant de choisir entre lecture et écriture.
+  - Prise en compte des coordonnées (**line** et **column**).
+  - Introduction de la **value** à écrire, convertie en byte puis en séquence binaire envoyée sur les différents PINs grâce aux chronogrammes créés par l'ancienne équipe.
 
-### Ports et registres
-Les microcontrolleurs intégrés aux cartes arduinos sont composés de 3 ports :
-- le port **D** est responsable des **pins numériques 0 à 7**;
-- le port **B** est responsable des **pins numériques 8 à 13**;
-- le port **B** est responsable des **pins analogiques**.
+### 3. Tests et Simulations
+- **arduino_simul** : Programme test pour comprendre l'écriture des données sur la carte Arduino.
+- **acquisition_unit** : Programme permettant de tester combien de cycles d'horloge (**clk()**) peuvent être observés sur une opération de lecture/écriture.
 
-Chaque port est lui-même composé de 3 registres à décalages (concrètement 3 variables bianaires appelées dans le code).
-- Le registre **PORT*** permet le changement de l'état d'un pin;
-- Le registre **PIN*** permet la lecture de l'état d'un pin.
+### 4. Optimisation de la Lecture
+L'ancienne approche lisait les signaux **PIN par PIN**, ce qui était inefficace. Une lecture par **PORTs simultanés** a été implémentée, permettant d'augmenter le nombre de **clk()** observés de 4-5 à 49 sur 128 envoyés.
+- **arduino_simul2** : Programme testant la capacité de lecture simultanée des informations reçues.
 
-#### Exemple
-Si les pins numériques **1** et **3** sont à l'état haut et les pins **0**, **2**, **4**, **5**, **6** et **7** sont à l'état bas, on aura :
-```
-PIND = 0101 0000 = PORTD
-```
-Attention à l'ordre de lecture ! Le bit de poids faible code ici l'état du pin 7 et non celui du pin 0.
+Cette version avec la lecture des ports en simultané avait été proposée l'année passée mais dont l'implémentation était assez étrange. Cette année, on a réussi à stabiliser cette méthode, ce qui a représenté une grosse avancée dans la fluidité du processus de lecture.
 
-Pour plus d'informations, cf https://docs.arduino.cc/retired/hacking/software/PortManipulation/.
+### 5. Implémentation de Matrice Conditionnelle
+Il est maintenant question de voir si on peut aller plus loin avec une potentielle **matrice conditionnelle**. L'idée ici, c'est de restreindre l'accès à certains points de la matrice en fonction des entrées détectées. 
 
+- **mat_condition** : Expérimentation d'une matrice conditionnelle avec des signaux continus 0V - 5V pour tester si on peut autoriser ou non l'accès à l'écriture sous certaines conditions.
 
-### Passage à l'état haut
-Il est donc possible de passer l'état d'un pin de l'état bas à l'état haut en appliquant l'opération arithmétique binaire **OU inclusif** à la variable **PORT***.
+On utilise toujours la lecture séquentielle, ce qui n'est pas optimal. Pour l'instant, c'est un prototype, car il nous manque une bonne compréhension du stockage des données. Mais les premiers tests sont prometteurs.
 
-#### Exemple
-On reprend l'exemple précédent. On souhaite passer le pin 5 à l'état haut.
+### 6. Utilisation de la Fonction *buffer[N]*
+Dernière découverte qui change un peu tout : la fonction *buffer[N]*. Grâce à elle, on peut stocker **les N derniers signaux lus** dans un **buffer circulaire**, ce qui permet d’effacer les anciennes données et de garder les plus récentes sans ralentir la lecture.
 
-```
-    0101 0000 
-OU  0000 0100
-=   0101 0100
-```
+- **arduino_simul3** : Première version du programme qui exploite cette nouvelle fonctionnalité. 
 
-### Passage à l'état bas
-De la même façon, il est possible de passer l'état d'un pin de l'état haut à l'état bas en appliquant l'opération arithmétique binaire **ET NON** à la variable **PORT***.
-
-#### Exemple
-On reprend l'exemple précédent. On souhaite passer le pin 5 à l'état bas.
-
-```
-        0101 0100 
-ET NON  0000 0100 
-=       0101 0000
-```
-### Lecture d'un pin
-Pour lire l'état d'un pin, il suffit d'isoler sa valeur en appliquant l'opération arithmétique binaire **ET** à la variable **PIN*** puis d'interpréter le résultat (nul ou non).
-
-#### Exemple
-Lecture du pin 1.
-
-```
-    0101 0000 
-ET  0100 0000
-=   0100 0000
-=   64
-=/= 0
-```
-
-### Implémentation
-Ainsi, pour lire ou écrire l'état d'un pin, le programe appelle les fonctions **pON** (passage à l'état haut), **pOFF** (passage à l'état bas) et **lect** définies en entête du code.
-
+C’est une avancée énorme : on a maintenant une lecture dynamique et rapide tout en optimisant le stockage des signaux. On continue d’expérimenter pour voir jusqu’où on peut pousser cette méthode.

@@ -81,3 +81,104 @@ void loop() {
     }
   }
 }
+
+// ------------------------------------------------------------------------
+bool pin_access(int col, int line, bool value) {
+  if (col < 0 || col >= 4) return false;  // Vérifie si la colonne est valide
+  if (line < 0 || line >= 4) return false;  // Vérifie si la colonne est valide
+  if (value != HIGH && value != LOW) return false;  // Vérifie si la valeur est valide
+
+  bool allHigh = true;  // Vérifie si tous les signaux sont HIGH
+
+  for (int i = 0; i < sizeof(monitoredPins)/sizeof(monitoredPins[0]); i++) {
+    if (digitalRead(monitoredPins[i].arduinoPin) == LOW) { // Si un signal est bas, refus
+      Serial.print("Pin ");
+      Serial.print(monitoredPins[i].arduinoPin);
+      Serial.println(" fermé");
+      allHigh = false;
+    }
+  }
+
+  return allHigh;
+}
+
+// Sans doute trop lent avec lecture séquentielle des ports, il faut une lecture simultanée des ports
+// ------------------------------------------------------------------------
+
+struct Capture {
+  uint8_t portB;
+  uint8_t portC;
+  uint8_t portD;
+  uint16_t clockCycle;
+};
+
+Capture captures[100];  // Stocke jusqu'à 100 cycles
+uint16_t cycleCount = 0;
+
+void stockerLecture() {
+  captures[cycleCount].portB = PINB;
+  captures[cycleCount].portC = PINC;
+  captures[cycleCount].portD = PIND;
+  captures[cycleCount].clockCycle = cycleCount;
+  cycleCount++;
+}
+
+void loop() {
+  while (cycleCount < 100) { // Exemple avec 100 cycles
+      stockerLecture();
+      clk();  // Synchronisation avec l'horloge
+  }
+}
+
+// Mode avec 100 cycles de sauvegardés mais est toujours trop lent il faut un écrasement de la mémoire => Buffer Circulaire
+// ------------------------------------------------------------------------
+
+#define BUFFER_SIZE 100  // Nombre de cycles stockés avant écrasement
+
+struct Capture {
+    uint8_t portB;
+    uint8_t portC;
+    uint8_t portD;
+    uint16_t clockCycle;
+};
+
+// Buffer circulaire
+Capture buffer[BUFFER_SIZE];
+volatile uint8_t writeIndex = 0;
+volatile uint8_t readIndex = 0;
+
+void stockerLecture() {
+  buffer[writeIndex].portB = PINB;
+  buffer[writeIndex].portC = PINC;
+  buffer[writeIndex].portD = PIND;
+  buffer[writeIndex].clockCycle = writeIndex; // Ou millis() pour un timestamp
+
+  writeIndex = (writeIndex + 1) % BUFFER_SIZE; // Incrément circulaire
+}
+
+Capture lireLecture() {
+  Capture data = buffer[readIndex]; // Lire la valeur actuelle
+
+  readIndex = (readIndex + 1) % BUFFER_SIZE; // Avancer dans le buffer
+  return data;
+}
+
+void analyserDonnees() {
+  for (int i = 0; i < BUFFER_SIZE; i++) {
+      Capture data = lireLecture();
+      Serial.print("Cycle: ");
+      Serial.print(data.clockCycle);
+      Serial.print(" - PortB: ");
+      Serial.print(data.portB, BIN);
+      Serial.print(" - PortC: ");
+      Serial.print(data.portC, BIN);
+      Serial.print(" - PortD: ");
+      Serial.println(data.portD, BIN);
+  }
+}
+
+void loop() {
+  stockerLecture(); // Stocker une lecture
+  analyserDonnees(); // Analyser les données
+  clk(); // Horloge
+}
