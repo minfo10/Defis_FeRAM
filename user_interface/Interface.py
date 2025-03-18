@@ -14,14 +14,34 @@ class Interface(tk.Tk):
     def __init__(self):
         super().__init__()
         
+        # Titre et icône de la fenêtre
         self.title('Défi FeRAM')
         self.iconphoto(True, PhotoImage(os.path.abspath('icon.ico')))
-        self.geometry('580x420')
-        self.configure(background='light gray')
+        
+        # Obtenir la résolution de l'écran
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        # Définir la taille de la fenêtre en fonction de la résolution
+        window_width = int(screen_width * 0.7)  # 70% de la largeur de l'écran
+        window_height = int(screen_height * 0.7)  # 70% de la hauteur de l'écran
+        self.geometry(f'{window_width}x{window_height}')
 
         # Police et couleurs par défaut
         self.option_add('*font', 'Arial 10')
         self.option_add('*foreground', 'black')
+        self.configure(background='light gray')
+    
+        # Ajouter des configurations pour le redimensionnement
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+
+        # Ajouter un binding pour ajuster la taille de la police lorsque la fenêtre est redimensionnée
+        self.bind('<Configure>', self.on_resize)
 
         # Barre de menu
         self.create_menu()
@@ -35,6 +55,10 @@ class Interface(tk.Tk):
         # Bouton quitter
         Button_quitter = ttk.Button(self, text='Quitter', command=self.close)
         Button_quitter.grid(row=4, column=1, pady=10, sticky='w')
+
+        # Initialiser la taille de la police
+        self.update_font_size()
+
 
     def create_menu(self):
         menuBar = tk.Menu(self)
@@ -177,6 +201,27 @@ class Interface(tk.Tk):
 
     def close(self):
         self.destroy()
+
+    def on_resize(self, event):
+        # Appeler update_font_size lorsqu'il y a un redimensionnement
+        self.update_font_size()
+
+    def update_font_size(self):
+        # Calculer la taille de police en fonction de la taille de la fenêtre
+        window_width, window_height = self.winfo_width(), self.winfo_height()
+        font_size = max(int(window_height / 40), 8)  # Par exemple, la taille de police ne peut pas être inférieure à 8
+
+        # Appliquer la taille de police à tous les éléments
+        self.option_add('*font', f'Arial {font_size}')
+
+        # Redimensionner également les widgets dans les frames
+        self.update_widgets_font_size()
+
+    def update_widgets_font_size(self):
+        # Mise à jour de la police pour les widgets existants
+        for widget in self.winfo_children():
+            if isinstance(widget, ttk.Widget):
+                widget.configure(font=("Arial", self.winfo_fpixels("1c") // 1.5))
 
 # Fonction pour détecter le port de l'Arduino
     def detect_arduino_port(self):
