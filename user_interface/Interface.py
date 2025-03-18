@@ -1,4 +1,5 @@
 import os
+import platform
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -8,6 +9,7 @@ import ImportExport
 import time
 import serial
 import serial.tools.list_ports
+from PIL import Image, ImageTk  # Import Pillow for handling .ico files
 
 
 class Interface(tk.Tk):
@@ -15,7 +17,8 @@ class Interface(tk.Tk):
         super().__init__()
         
         self.title('Défi FeRAM')
-        self.iconphoto(True, PhotoImage(os.path.abspath('icon.ico')))
+        self.iconphoto(True, ImageTk.PhotoImage(Image.open(os.path.abspath('icon.ico'))))
+        # self.iconphoto(True, PhotoImage(os.path.abspath('icon.ico')))
         self.geometry('580x420')
         self.configure(background='light gray')
 
@@ -178,11 +181,11 @@ class Interface(tk.Tk):
     def close(self):
         self.destroy()
 
-# Fonction pour détecter le port de l'Arduino
+    # Fonction pour détecter le port de l'Arduino
     def detect_arduino_port(self):
         # On récupère la liste des ports série et le système d'exploitation
         ports = serial.tools.list_ports.comports()
-        os_type = os.uname().sysname
+        os_type = platform.system()
 
         # On parcourt la liste des ports
         for port in sorted(ports):
@@ -192,13 +195,13 @@ class Interface(tk.Tk):
             if os_type in ['Linux', 'Darwin']:  # Darwin is macOS
                 if 'ttyACM' in port.device or 'ttyUSB' in port.device:
                     return port.device
-            
+                
             # Windows
             elif os_type == 'Windows':
                 if 'COM' in port.device:
                     return port.device
 
-        # Si aucun port n'est trouvé, on retourne None
+            # Si aucun port n'est trouvé, on retourne None
         return None
     
 
