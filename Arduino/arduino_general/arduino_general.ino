@@ -93,7 +93,7 @@ void clk() {
   delayMicroseconds(10);
   digitalWrite(CLOCK, LOW);
   delayMicroseconds(10);
-  Serial.print("imp");
+
 }
 
 // *** Menu interactif ***

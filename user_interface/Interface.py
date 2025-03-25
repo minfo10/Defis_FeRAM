@@ -3,22 +3,15 @@
 # Importation des modules
 import platform
 import os
-import webbrowser
-import time
-import serial
-import serial.tools.list_ports
-
-# Importation des modules tkinter
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import PhotoImage
-from tkinter import filedialog as fd
-from tkinter import messagebox as mb
-
-# Importation des classes
-from import_export import ImportInterface
-from import_export import ExportInterface
+import webbrowser
+import ImportExport
+import time
+import serial
+import serial.tools.list_ports
 
 
 class Interface(tk.Tk):
@@ -32,15 +25,8 @@ class Interface(tk.Tk):
         # Titre et icône de la fenêtre
         self.title('Défi FeRAM')
         self.iconphoto(True, PhotoImage(os.path.abspath('icon.ico')))
-        
-        # Obtenir la résolution de l'écran
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-
-        # Définir la taille de la fenêtre en fonction de la résolution
-        window_width = int(screen_width * 0.7)  # 70% de la largeur de l'écran
-        window_height = int(screen_height * 0.7)  # 70% de la hauteur de l'écran
-        self.geometry(f'{window_width}x{window_height}')
+        self.geometry('580x420')
+        self.configure(background='light gray')
 
         # Police et couleurs par défaut
         # self.option_add('*font', 'Arial 10')
@@ -292,7 +278,10 @@ class Interface(tk.Tk):
             print(f"Erreur de connexion: {e}")
 
 
-    # Function to detect the Arduino connection port
+    def close(self):
+        self.destroy()
+
+# Fonction pour détecter le port de l'Arduino
     def detect_arduino_port(self):
         # Retrieve the list of serial ports and determine the system's OS
         ports = serial.tools.list_ports.comports()
@@ -305,13 +294,14 @@ class Interface(tk.Tk):
             # Handle different OS types to determine the correct port for Arduino
             if os_type in ['Linux', 'Darwin']:  # 'Darwin' is for macOS
                 if 'ttyACM' in port.device or 'ttyUSB' in port.device:
-                    return port.device  # Return the Arduino port on Linux/macOS
-
+                    return port.device
+            
+            # Windows
             elif os_type == 'Windows':
                 if 'COM' in port.device:
                     return port.device  # Return the Arduino port on Windows
 
-        # If no Arduino port is found, return None
+        # Si aucun port n'est trouvé, on retourne None
         return None
 
 #----------------------------------------------------------
