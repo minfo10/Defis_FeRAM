@@ -90,9 +90,9 @@ void loop() {
 void clk() {
   // Simule un coup d'horloge.
   digitalWrite(CLOCK, HIGH);
-  delayMicroseconds(10);
+  delayMicroseconds(200);
   digitalWrite(CLOCK, LOW);
-  delayMicroseconds(10);
+  delayMicroseconds(200);
 
 }
 
