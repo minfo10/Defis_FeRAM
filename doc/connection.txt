@@ -1,0 +1,32 @@
+// Matrix : 128 x 128 
+//        7 bits x 7 bits
+//  ** Configuration without SF is a following **
+//
+//  Pad 01   -> PG delay WL to SL tuning     - Analog in 
+//  Pad 02   -> PG delay SL to SA tuning     - Analog in 
+//  Pad 03   -> PG delay SA to WB tuning     - Analog in      
+//  Pad 04   -> PG width tuning WB           - Analog in      
+//  Pad 05   -> PG width tuning SL           - Analog in        
+//  Pad 06   -> PG width tuning SA           - Analog in     
+//  Pad 07   -> PG width tuning WL           - Analog in      
+//
+//  Pad 08   -> WB                    - Digital in      
+//  Pad 09   -> SA                    - Digital in       
+//  Pad 10   -> SL                    - Digital in   
+//  Pad 11   -> WL                    - Digital in
+//  Pad 12   -> PRE                   - Digital in
+//  Pad 13   -> WE                    - Digital in
+//  Pad 14   -> SET_PARALLEL          - Digital in
+//
+//  Pad 15   -> VREF                  - Analog in 
+//
+//  Pad 16   -> GND                   - GND
+//  Pad 17   -> VDD                   - Analog in 
+//  Pad 18   -> VDD_WL                - Analog in 
+//  Pad 19   -> VDD_SA                - Analog in 
+//  Pad 20   -> VDD_SL                - Analog in 
+//  Pad 21   -> CK_SC                 - Digital in
+//  Pad 22   -> SC_IN                 - Digital in
+//  Pad 23   -> SC_OUT                - Digital out
+//  Pad 24   -> SC_SEL<0>             - Digital in
+//  Pad 25   -> SC_SEL<1>             - Digital in
