@@ -55,6 +55,7 @@ class Interface(tk.Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
+
         # Ajouter un binding pour ajuster la taille de la police lorsque la fenêtre est redimensionnée
         self.bind('<Configure>', self.on_resize)
 
@@ -220,46 +221,52 @@ class Interface(tk.Tk):
 # Function to resize
 #----------------------------------------------------------
 
-    # Function to handle window resizing
+    # Update the font size dynamically based on window size
     def on_resize(self, event):
-        # Update font size when the window is resized
+        # Update the font size when the window is resized
         self.update_font_size()
 
-    # Function to update font size dynamically
     def update_font_size(self):
         # Calculate the font size based on the window's height
         window_width, window_height = self.winfo_width(), self.winfo_height()
         font_size = max(int(window_height / 40), 8)  # Minimum font size is 8
 
-        # Apply the new font size to all widgets
+        # Apply the new font size to all widgets that support font resizing
         self.option_add('*font', f'Arial {font_size}')
-        self.update_widgets_font_size()
 
+        # Update styles for all ttk widgets
+        self.update_widgets_font_size_and_padding()
 
-    # Function to update font size for all widgets
-    def update_widgets_font_size(self):
-        # Update the font size of all existing widgets
+    def update_widgets_font_size_and_padding(self):
+        # Create a ttk.Style instance to modify styles
+        style = ttk.Style()
+
+        # Get the scaling factor from the current font size
+        font_size = self.winfo_fpixels("1c") // 1.5  # Adjust the divisor for desired scaling
+
+        # Update styles for ttk widgets
+        style.configure("TButton", font=("Arial", font_size))
+        style.configure("TLabel", font=("Arial", font_size))
+        style.configure("TEntry", font=("Arial", font_size))
+        style.configure("TText", font=("Arial", font_size))
+
+        # Update font size and padding for all widgets
         for widget in self.winfo_children():
-            # Check for text-based widgets
-            if isinstance(widget, (tk.Label, tk.Button, tk.Entry, tk.Text)):
+            # Adjust font size for valid widgets
+            if isinstance(widget, (ttk.Button, ttk.Label, ttk.Entry, tk.Text)):
                 try:
-                    # Apply the font change
-                    widget.configure(font=("Arial", self.winfo_fpixels("1c") // 1.5))
-                except Exception as e:
-                    print(f"Error applying font to widget {widget}: {e}")
-            
-            # For ttk widgets, handle font separately
-            elif isinstance(widget, (ttk.Label, ttk.Button, ttk.Entry)):
-                try:
-                    # Apply the font change for ttk widgets (may need a custom style in ttk)
-                    widget.configure(style="TButton")  # This works for ttk buttons
-                    widget.configure(font=("Arial", self.winfo_fpixels("1c") // 1.5))
-                except Exception as e:
-                    print(f"Error applying font to ttk widget {widget}: {e}")
-            
-            # Skip non-text widgets
-            else:
-                print(f"Skipping widget {widget}, as it doesn't support font changes.")
+                    # For tkinter widgets, directly set the font size
+                    if isinstance(widget, (tk.Label, tk.Button, tk.Entry, tk.Text)):
+                        widget.configure(font=("Arial", font_size))  # Configure font size only
+                except tk.TclError:
+                    pass  # Ignore widgets that do not support the font option
+
+            # If widget uses grid, use widget.grid_configure() to modify padx/pady
+            if isinstance(widget, (ttk.Button, ttk.Label, ttk.Entry, tk.Button, tk.Label, tk.Entry)):
+                widget.grid_configure(padx=5, pady=5)  # Example padding if using grid layout
+            elif isinstance(widget, tk.Text):
+                widget.grid_configure(padx=5, pady=5)  # Example padding for Text widget
+
 
 
 #----------------------------------------------------------
