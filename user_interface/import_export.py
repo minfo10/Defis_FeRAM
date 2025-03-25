@@ -4,18 +4,6 @@ import tkinter as tk
 from tkinter import filedialog as fd
 from tkinter import messagebox as mb
 
-# Fonctions d'exportation et d'importation
-def exportation(self):
-    # Create a new window for export and start the process
-    exportWindow = ExportInterface(self)
-    exportWindow.grab_set()  # Make the export window modal (block interaction with parent window)
-
-def importation(self):
-    # Create a new window for import and start the process
-    importWindow = ImportInterface(self)
-    importWindow.grab_set()  # Make the import window modal (block interaction with parent window)
-
-
 # Importation de données
 class ImportInterface(tk.Toplevel):
     def __init__(self, parent):
