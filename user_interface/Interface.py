@@ -1,19 +1,24 @@
 import os
+import platform
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import PhotoImage
 import webbrowser
 import ImportExport
 import time
 import serial
 import serial.tools.list_ports
+from PIL import Image, ImageTk  # Import Pillow for handling .ico files
+
 
 class Interface(tk.Tk):
     def __init__(self):
         super().__init__()
         
         self.title('Défi FeRAM')
-        self.iconbitmap(os.getcwd() + '\icon.ico')
+        self.iconphoto(True, ImageTk.PhotoImage(Image.open(os.path.abspath('icon.ico'))))
+        # self.iconphoto(True, PhotoImage(os.path.abspath('icon.ico')))
         self.geometry('580x420')
         self.configure(background='light gray')
 
@@ -60,15 +65,15 @@ class Interface(tk.Tk):
         frame_connexion.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
         # Variables
-        self.port_com = tk.StringVar(self, value="COM6")
-        self.baud_rate = tk.StringVar(self, value="9600")
+        self.port_com = tk.StringVar(self, value=self.detect_arduino_port())
+        self.baud_rate = tk.StringVar(self, value="2000000")
         self.connection_status = tk.StringVar(self, value="Non connecté")
 
         # Information de connexion
-        ttk.Label(frame_connexion, text="Port de l'Arduino").grid(row=0, column=0, sticky="w", pady=5)
+        ttk.Label(frame_connexion, text="Port de l'Arduino :").grid(row=0, column=0, sticky="w", pady=5)
         ttk.Entry(frame_connexion, textvariable=self.port_com, justify='center', width=12).grid(row=0, column=1, padx=5)
 
-        ttk.Label(frame_connexion, text="Baud rate)").grid(row=1, column=0, sticky="w", pady=5)
+        ttk.Label(frame_connexion, text="Baud rate :").grid(row=1, column=0, sticky="w", pady=5)
         ttk.Entry(frame_connexion, textvariable=self.baud_rate, justify='center', width=12).grid(row=1, column=1, padx=5)
 
         # Voyant de connexion       
@@ -89,7 +94,7 @@ class Interface(tk.Tk):
         frame_information = ttk.LabelFrame(self, text="Informations importantes", padding=(10, 10))
         frame_information.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
-        info_text = tk.Text(frame_information, height=6, width=30, wrap="word", bg="white", state="normal", relief="flat")
+        info_text = tk.Text(frame_information, height=6, width=40, wrap="word", bg="white", state="normal", relief="flat")
         info_text.insert("1.0", "1. Vérifiez que le port COM et le baud rate soient bons.\n")
         info_text.insert("2.0", "2. Assurez-vous que ArduinoIDE est fermé (une console ouverte).\n")
         info_text.insert("3.0", "3. Cliquez sur 'Vérifier' pour confirmer la connexion Arduino.\n")
@@ -102,7 +107,7 @@ class Interface(tk.Tk):
         frame_write.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
 
         # Variables
-        self.write = tk.StringVar(self, value="12")
+        self.write = tk.StringVar(self, value="0")
         self.wligne = tk.StringVar(self, value="1")
         self.wcolonne = tk.StringVar(self, value="1")
 
@@ -176,7 +181,30 @@ class Interface(tk.Tk):
     def close(self):
         self.destroy()
 
+    # Fonction pour détecter le port de l'Arduino
+    def detect_arduino_port(self):
+        # On récupère la liste des ports série et le système d'exploitation
+        ports = serial.tools.list_ports.comports()
+        os_type = platform.system()
+
+        # On parcourt la liste des ports
+        for port in sorted(ports):
+            print(f"Port: {port.device}, Description: {port.description}, HWID: {port.hwid}")
+            
+            # On récupère le système d'exploitation
+            if os_type in ['Linux', 'Darwin']:  # Darwin is macOS
+                if 'ttyACM' in port.device or 'ttyUSB' in port.device:
+                    return port.device
+                
+            # Windows
+            elif os_type == 'Windows':
+                if 'COM' in port.device:
+                    return port.device
+
+            # Si aucun port n'est trouvé, on retourne None
+        return None
     
+
 
 # Fonction pour recevoir les données depuis l'arduino de controle
     def receive_data(self):
