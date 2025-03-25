@@ -1,17 +1,26 @@
 # Description: Interface graphique pour le défi FeRAM
+# Ce programme est une interface utilisateur graphique (GUI) développée en Python avec Tkinter.
+# Il permet de communiquer avec un Arduino pour lire et écrire des données sur une mémoire FeRAM.
+# Les fonctionnalités incluent la détection automatique du port Arduino, l'envoi et la réception de données,
+# ainsi que l'importation et l'exportation de fichiers texte. L'interface est conçue pour être intuitive
+# et offre des sections dédiées pour la connexion, l'écriture, la lecture et les informations importantes.
+
 
 # Importation des modules
 import platform
 import os
-import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
-from tkinter import PhotoImage
 import webbrowser
-import ImportExport
 import time
 import serial
 import serial.tools.list_ports
+
+# Importation des modules tkinter
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox as mb
+from tkinter import filedialog as fd
+from tkinter import simpledialog as sd
+from tkinter import PhotoImage
 
 
 class Interface(tk.Tk):
@@ -60,6 +69,9 @@ class Interface(tk.Tk):
 
         # Initialiser la taille de la police
         self.update_font_size()
+
+
+
 
 
 #----------------------------------------------------------
@@ -163,6 +175,10 @@ class Interface(tk.Tk):
         print("Reset triggered")  # Temporary action for the reset function
 
 
+
+
+
+
 #----------------------------------------------------------
 # Function to create the menu
 #----------------------------------------------------------
@@ -202,6 +218,10 @@ class Interface(tk.Tk):
     # Function to open the GitHub repository
     def open_github(self):
         webbrowser.open("https://github.com/minfo10/Defis_FeRAM")
+
+
+
+
 
 #----------------------------------------------------------
 # Function to resize
@@ -255,6 +275,8 @@ class Interface(tk.Tk):
 
 
 
+
+
 #----------------------------------------------------------
 # Function to check the connection
 #----------------------------------------------------------
@@ -304,20 +326,8 @@ class Interface(tk.Tk):
         # Si aucun port n'est trouvé, on retourne None
         return None
 
-#----------------------------------------------------------
-# Function to export and import data
-#----------------------------------------------------------
 
-    # Fonctions d'exportation et d'importation
-    def exportation(self):
-        # Create a new window for export and start the process
-        exportWindow = ExportInterface(self)
-        exportWindow.grab_set()  # Make the export window modal (block interaction with parent window)
 
-    def importation(self):
-        # Create a new window for import and start the process
-        importWindow = ImportInterface(self)
-        importWindow.grab_set()  # Make the import window modal (block interaction with parent window)
 
 #----------------------------------------------------------
 # Receive Data Function
@@ -400,6 +410,10 @@ class Interface(tk.Tk):
             if 'ser' in locals() and ser.is_open:
                 ser.close()
 
+
+
+
+
 #----------------------------------------------------------
 # Send Data Function
 #----------------------------------------------------------
@@ -461,3 +475,89 @@ class Interface(tk.Tk):
             # Fermer le port série
             if 'ser' in locals() and ser.is_open:
                 ser.close()
+
+
+
+
+
+
+#----------------------------------------------------------
+# Function to export and import data
+#----------------------------------------------------------
+
+    # Fonctions d'exportation et d'importation
+    def exportation(self):
+        # Create a new window for export and start the process
+        exportWindow = ExportInterface(self)
+        exportWindow.grab_set()  # Make the export window modal (block interaction with parent window)
+
+    def importation(self):
+        # Create a new window for import and start the process
+        importWindow = ImportInterface(self)
+        importWindow.grab_set()  # Make the import window modal (block interaction with parent window)
+
+
+
+
+
+
+#----------------------------------------------------------
+# Importation de données
+#----------------------------------------------------------
+
+class ImportInterface(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        
+        self.title("Import Data")
+        self.parent = parent  # Reference to the parent window
+        
+        # Ask for the file to import
+        file_path = fd.askopenfilename(
+            title="Select a file to import",
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt")]
+        )
+        
+        if file_path:  # Check if the user did not cancel
+            try:
+                # Try reading the file content
+                with open(file_path, "r") as file:
+                    data = file.read()
+                    # Display imported data in a message box
+                    mb.showinfo("Imported Data", data)
+                    self.destroy()  # Close the import window after showing data
+            except Exception as e:
+                # Handle any errors during file reading
+                mb.showerror("Error", f"Failed to import data: {e}")
+                self.destroy()  # Close
+
+#----------------------------------------------------------
+# Exportation de données
+#----------------------------------------------------------
+class ExportInterface(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        
+        self.title("Export Data")
+        self.parent = parent  # Reference to the parent window
+        
+        # Ask for the file to save the data
+        file_path = fd.asksaveasfilename(
+            initialfile="exported_data.txt",
+            defaultextension=".txt",
+            filetypes=[("Text files", "*.txt")]
+        )
+        
+        if file_path:  # Check if the user did not cancel
+            try:
+                # Sample data to export (you can change this as needed)
+                with open(file_path, "w") as file:
+                    file.write("Sample data\n")
+                # Show a success message
+                mb.showinfo("Success", "Data exported successfully!")
+                self.destroy()  # Close the export window after success
+            except Exception as e:
+                # Handle any errors during file writing
+                mb.showerror("Error", f"Failed to export data: {e}")
+                self.destroy()  # Close
