@@ -19,7 +19,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as mb
 from tkinter import filedialog as fd
-from tkinter import simpledialog as sd
 from tkinter import PhotoImage
 
 
@@ -33,7 +32,7 @@ class Interface(tk.Tk):
         
         # Titre et icône de la fenêtre
         self.title('Défi FeRAM')
-        # self.iconphoto(True, PhotoImage(os.path.abspath('../icon.ico')))
+        #self.iconphoto(True, PhotoImage(os.path.abspath('icon.ico')))
         self.geometry('580x420')
         self.configure(background='light gray')
 
@@ -49,6 +48,9 @@ class Interface(tk.Tk):
         self.grid_rowconfigure(3, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
+        
+        self.grid_rowconfigure(0, weight=1, minsize=50)  # Ajuster la taille de la ligne 0
+        self.grid_columnconfigure(0, weight=1, minsize=150)  # Ajuster la taille de la colonne 0
 
 
         # Ajouter un binding pour ajuster la taille de la police lorsque la fenêtre est redimensionnée
@@ -68,7 +70,7 @@ class Interface(tk.Tk):
         Button_quitter.grid(row=4, column=1, pady=10, sticky='w')
 
         # Initialiser la taille de la police
-        self.update_font_size()
+        #self.update_font_size()
 
 
 
@@ -166,13 +168,13 @@ class Interface(tk.Tk):
         # Bouton Recevoir
         ttk.Button(frame_read, text="Recevoir", command=self.receive_data).grid(row=3, column=0, columnspan=2, pady=10)
 
-    # Function to close the application
+    # Fonction pour fermer l'application
     def close(self):
         self.destroy()
 
-    # Placeholder function for reset action
+    # Fonction pour réinitialiser l'Arduino
     def reset(self):
-        print("Reset triggered")  # Temporary action for the reset function
+        print("Reset triggered")  # C'est un exemple, vous pouvez le remplacer par la logique de réinitialisation réelle
 
 
 
@@ -180,42 +182,42 @@ class Interface(tk.Tk):
 
 
 #----------------------------------------------------------
-# Function to create the menu
+# Fonction pour créer le menu
 #----------------------------------------------------------
 
     def create_menu(self):
         menuBar = tk.Menu(self)
         self.config(menu=menuBar)
 
-        # Create "Data" menu
+        # créer le menu "Fichier"
         self.create_data_menu(menuBar)
 
-        # Create "Arduino" menu
+        # créer le menu "Arduino"
         self.create_arduino_menu(menuBar)
 
-        # Create "Help" menu
+        # créer le menu "Aide"
         self.create_help_menu(menuBar)
 
-    # Function to create the "Data" menu
+    # Fonction pour créer le menu "Fichier"
     def create_data_menu(self, menuBar):
         menuData = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label='Data', menu=menuData)
         menuData.add_command(label="Exporter en .txt", command=self.exportation)
         menuData.add_command(label="Importer en .txt", command=self.importation)
 
-    # Function to create the "Arduino" menu
+    # Fonction pour créer le menu "Arduino"
     def create_arduino_menu(self, menuBar):
         menuArduino = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label='Arduino', menu=menuArduino)
         menuArduino.add_command(label="Reset", command=self.reset)
 
-    # Function to create the "Help" menu
+    # Fonction pour créer le menu "Aide"
     def create_help_menu(self, menuBar):
         menuHelp = tk.Menu(menuBar, tearoff=0)
         menuBar.add_cascade(label='Help', menu=menuHelp)
         menuHelp.add_command(label='GitHub', command=self.open_github)
 
-    # Function to open the GitHub repository
+    # Fonction pour ouvrir GitHub
     def open_github(self):
         webbrowser.open("https://github.com/minfo10/Defis_FeRAM")
 
@@ -224,7 +226,7 @@ class Interface(tk.Tk):
 
 
 #----------------------------------------------------------
-# Function to resize
+# Fonction pour redimensionner la fenêtre
 #----------------------------------------------------------
 
     def on_resize(self, _=None):
@@ -253,11 +255,11 @@ class Interface(tk.Tk):
         return font_size, padding_factor
 
 
-    # Fonction pour mettre à jour la police et les paddings des widgets
+    # Fonction pour mettre à jour la taille de la police et les paddings
     def update_widgets_font(self, font_size, padding_factor):
         print(f"Updating fonts to {font_size} and padding to {padding_factor}")
         for widget in self.winfo_children():
-            # Vérification si le widget peut recevoir une nouvelle configuration de police
+            # Ensure the widget is updated
             print(f"Updating widget: {widget}")
             if isinstance(widget, (tk.Label, tk.Button, tk.Entry, tk.Text)):
                 widget.configure(font=("Arial", font_size))  # Mise à jour de la police
@@ -266,34 +268,30 @@ class Interface(tk.Tk):
                 style.configure("TLabel", font=("Arial", font_size))
                 style.configure("TButton", font=("Arial", font_size))
                 style.configure("TEntry", font=("Arial", font_size))
-            # Mettre à jour les paddings
-            if isinstance(widget, (tk.Label, ttk.Label, tk.Button, ttk.Button, ttk.Entry, tk.Entry)):
-                widget.grid_configure(padx=padding_factor, pady=padding_factor)
             
-            # Assurer que le widget soit rafraîchi
-            widget.update_idletasks()
-
-
+            # Mise à jour des paddings
+            widget.grid_configure(padx=padding_factor, pady=padding_factor)
+            widget.update_idletasks()  # Forcer la mise à jour visuelle
 
 
 #----------------------------------------------------------
-# Function to check the connection
+# Fonction pour détecter le port de l'Arduino
 #----------------------------------------------------------
 
-    # Function to check the connection with the selected port
+    # Fonction pour vérifier la connexion
     def check_connection(self):
-        # Retrieve the selected COM port and baud rate from the user interface
+        # Retrouver le port et le baud rate
         port = self.port_com.get()
         baud = int(self.baud_rate.get())
 
         try:
-            # Attempt to establish a serial connection
+            # Essayer d'ouvrir le port série
             with serial.Serial(port, baud, timeout=1) as ser:
-                # If successful, update connection status and change the indicator to green
+                # Si la connexion est réussie, mettre à jour le statut de connexion
                 self.connection_status.set("Connecté")
                 self.style.configure("Voyant.TLabel", background="green")  
         except Exception as e:
-            # If an error occurs, update connection status and change the indicator to red
+            # Si une erreur se produit, mettre à jour le statut de connexion
             self.connection_status.set("Non connecté")
             self.style.configure("Voyant.TLabel", background="red")  
             print(f"Erreur de connexion: {e}")
@@ -304,23 +302,23 @@ class Interface(tk.Tk):
 
 # Fonction pour détecter le port de l'Arduino
     def detect_arduino_port(self):
-        # Retrieve the list of serial ports and determine the system's OS
+        # Retrouver les ports série disponibles et le système d'exploitation
         ports = serial.tools.list_ports.comports()
         os_type = platform.system()
 
-        # Iterate over the available serial ports
+        # Initialiser le port Arduino à None
         for port in sorted(ports):
             print(f"Port: {port.device}, Description: {port.description}, HWID: {port.hwid}")
 
-            # Handle different OS types to determine the correct port for Arduino
-            if os_type in ['Linux', 'Darwin']:  # 'Darwin' is for macOS
+            # Linux et macOS
+            if os_type in ['Linux', 'Darwin']:  # 'Darwin' macOS
                 if 'ttyACM' in port.device or 'ttyUSB' in port.device:
                     return port.device
             
             # Windows
             elif os_type == 'Windows':
                 if 'COM' in port.device:
-                    return port.device  # Return the Arduino port on Windows
+                    return port.device  # 'COM' est le préfixe pour les ports série sur Windows
 
         # Si aucun port n'est trouvé, on retourne None
         return None
@@ -329,7 +327,7 @@ class Interface(tk.Tk):
 
 
 #----------------------------------------------------------
-# Receive Data Function
+# Fonction pour recevoir les données
 #----------------------------------------------------------
 
     # Fonction pour recevoir les données depuis l'arduino de controle
@@ -402,7 +400,7 @@ class Interface(tk.Tk):
 
         except serial.SerialException as e:
             # Affiche une boîte de message en cas de port indisponible
-            messagebox.showerror("Erreur de port", f"{e}")
+            mb.showerror("Erreur de port", f"{e}")
 
         finally:
             # Ferme le port série après la lecture
@@ -414,7 +412,7 @@ class Interface(tk.Tk):
 
 
 #----------------------------------------------------------
-# Send Data Function
+# fonction pour envoyer les données
 #----------------------------------------------------------
 
     # Fonction pour envoyer les données vers l'arduino de controle
@@ -460,15 +458,15 @@ class Interface(tk.Tk):
                     if len(lines) == 7:
                         # Si oui, lire la septième ligne
                         derniere_ligne = lines[6]
-                        messagebox.showinfo("Info",f"{derniere_ligne}")
+                        mb.showinfo("Info",f"{derniere_ligne}")
                         # Vous pouvez sortir de la boucle ou faire d'autres traitements ici
                     break  # Sortir de la boucle après avoir lu la sixième ligne
                 except ValueError:
-                    messagebox.showerror("Erreur de valeur", f"Veuillez entrer un nombre valide.")
+                    mb.showerror("Erreur de valeur", f"Veuillez entrer un nombre valide.")
 
         except serial.SerialException as e:
             # Affiche une boîte de message en cas de port indisponible
-            messagebox.showerror("Erreur de port", f"{e}")
+            mb.showerror("Erreur de port", f"{e}")
 
         finally:
             # Fermer le port série
@@ -481,20 +479,19 @@ class Interface(tk.Tk):
 
 
 #----------------------------------------------------------
-# Function to export and import data
+# Fonction pour détecter le port de l'Arduino
 #----------------------------------------------------------
 
     # Fonctions d'exportation et d'importation
     def exportation(self):
-        # Create a new window for export and start the process
+        # Créer une nouvelle fenêtre pour l'exportation et commencer le processus
         exportWindow = ExportInterface(self)
-        exportWindow.grab_set()  # Make the export window modal (block interaction with parent window)
+        exportWindow.grab_set()  # Fais de la fenêtre d'exportation modale (bloque l'interaction avec la fenêtre parente)
 
     def importation(self):
-        # Create a new window for import and start the process
+        # Créer une nouvelle fenêtre pour l'importation et commencer le processus
         importWindow = ImportInterface(self)
-        importWindow.grab_set()  # Make the import window modal (block interaction with parent window)
-
+        importWindow.grab_set()  # Fais de la fenêtre d'importation modale (bloque l'interaction avec la fenêtre parente)
 
 
 
@@ -509,27 +506,27 @@ class ImportInterface(tk.Toplevel):
         super().__init__(parent)
         
         self.title("Import Data")
-        self.parent = parent  # Reference to the parent window
+        self.parent = parent  # Référence à la fenêtre parente
         
-        # Ask for the file to import
+        # Demander à l'utilisateur de sélectionner un fichier à importer
         file_path = fd.askopenfilename(
             title="Select a file to import",
             defaultextension=".txt",
             filetypes=[("Text files", "*.txt")]
         )
         
-        if file_path:  # Check if the user did not cancel
+        if file_path:  # Vérifier si l'utilisateur n'a pas annulé
             try:
-                # Try reading the file content
+                # Lire le contenu du fichier sélectionné
                 with open(file_path, "r") as file:
                     data = file.read()
-                    # Display imported data in a message box
+                    # Afficher le contenu dans une boîte de message
                     mb.showinfo("Imported Data", data)
-                    self.destroy()  # Close the import window after showing data
+                    self.destroy()  # Fermer la fenêtre d'importation après succès
             except Exception as e:
-                # Handle any errors during file reading
+                # Gérer les erreurs lors de la lecture du fichier
                 mb.showerror("Error", f"Failed to import data: {e}")
-                self.destroy()  # Close
+                self.destroy()  # Fermer la fenêtre d'importation en cas d'erreur
 
 #----------------------------------------------------------
 # Exportation de données
@@ -539,24 +536,24 @@ class ExportInterface(tk.Toplevel):
         super().__init__(parent)
         
         self.title("Export Data")
-        self.parent = parent  # Reference to the parent window
-        
-        # Ask for the file to save the data
+        self.parent = parent  # Référence à la fenêtre parente
+
+        # Demander à l'utilisateur de sélectionner un emplacement pour enregistrer le fichier
         file_path = fd.asksaveasfilename(
             initialfile="exported_data.txt",
             defaultextension=".txt",
             filetypes=[("Text files", "*.txt")]
         )
         
-        if file_path:  # Check if the user did not cancel
+        if file_path:  #  Vérifier si l'utilisateur n'a pas annulé
             try:
-                # Sample data to export (you can change this as needed)
+                # Écrire des données d'exemple dans le fichier sélectionné
                 with open(file_path, "w") as file:
                     file.write("Sample data\n")
-                # Show a success message
+                # Afficher un message de succès
                 mb.showinfo("Success", "Data exported successfully!")
-                self.destroy()  # Close the export window after success
+                self.destroy()  # Fermer la fenêtre d'exportation après succès
             except Exception as e:
-                # Handle any errors during file writing
+                # Gérer les erreurs lors de l'écriture du fichier
                 mb.showerror("Error", f"Failed to export data: {e}")
-                self.destroy()  # Close
+                self.destroy()  # Fermer la fenêtre d'exportation en cas d'erreur
