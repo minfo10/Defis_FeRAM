@@ -19,7 +19,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as mb
 from tkinter import filedialog as fd
-from tkinter import simpledialog as sd
 from tkinter import PhotoImage
 
 
@@ -49,6 +48,9 @@ class Interface(tk.Tk):
         self.grid_rowconfigure(3, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
+        
+        self.grid_rowconfigure(0, weight=1, minsize=50)  # Set minimum size for row 0
+        self.grid_columnconfigure(0, weight=1, minsize=150)  # Set minimum size for column 0
 
 
         # Ajouter un binding pour ajuster la taille de la police lorsque la fenêtre est redimensionnée
@@ -253,11 +255,11 @@ class Interface(tk.Tk):
         return font_size, padding_factor
 
 
-    # Fonction pour mettre à jour la police et les paddings des widgets
+    # Fonction pour mettre à jour la taille de la police et les paddings
     def update_widgets_font(self, font_size, padding_factor):
         print(f"Updating fonts to {font_size} and padding to {padding_factor}")
         for widget in self.winfo_children():
-            # Vérification si le widget peut recevoir une nouvelle configuration de police
+            # Ensure the widget is updated
             print(f"Updating widget: {widget}")
             if isinstance(widget, (tk.Label, tk.Button, tk.Entry, tk.Text)):
                 widget.configure(font=("Arial", font_size))  # Mise à jour de la police
@@ -266,14 +268,10 @@ class Interface(tk.Tk):
                 style.configure("TLabel", font=("Arial", font_size))
                 style.configure("TButton", font=("Arial", font_size))
                 style.configure("TEntry", font=("Arial", font_size))
-            # Mettre à jour les paddings
-            if isinstance(widget, (tk.Label, ttk.Label, tk.Button, ttk.Button, ttk.Entry, tk.Entry)):
-                widget.grid_configure(padx=padding_factor, pady=padding_factor)
             
-            # Assurer que le widget soit rafraîchi
-            widget.update_idletasks()
-
-
+            # Mise à jour des paddings
+            widget.grid_configure(padx=padding_factor, pady=padding_factor)
+            widget.update_idletasks()  # Forcer la mise à jour visuelle
 
 
 #----------------------------------------------------------
@@ -402,7 +400,7 @@ class Interface(tk.Tk):
 
         except serial.SerialException as e:
             # Affiche une boîte de message en cas de port indisponible
-            messagebox.showerror("Erreur de port", f"{e}")
+            mb.showerror("Erreur de port", f"{e}")
 
         finally:
             # Ferme le port série après la lecture
@@ -460,15 +458,15 @@ class Interface(tk.Tk):
                     if len(lines) == 7:
                         # Si oui, lire la septième ligne
                         derniere_ligne = lines[6]
-                        messagebox.showinfo("Info",f"{derniere_ligne}")
+                        mb.showinfo("Info",f"{derniere_ligne}")
                         # Vous pouvez sortir de la boucle ou faire d'autres traitements ici
                     break  # Sortir de la boucle après avoir lu la sixième ligne
                 except ValueError:
-                    messagebox.showerror("Erreur de valeur", f"Veuillez entrer un nombre valide.")
+                    mb.showerror("Erreur de valeur", f"Veuillez entrer un nombre valide.")
 
         except serial.SerialException as e:
             # Affiche une boîte de message en cas de port indisponible
-            messagebox.showerror("Erreur de port", f"{e}")
+            mb.showerror("Erreur de port", f"{e}")
 
         finally:
             # Fermer le port série
