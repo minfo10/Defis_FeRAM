@@ -528,6 +528,9 @@ class ImportInterface(tk.Toplevel):
                 mb.showerror("Error", f"Failed to import data: {e}")
                 self.destroy()  # Fermer la fenêtre d'importation en cas d'erreur
 
+
+
+
 #----------------------------------------------------------
 # Exportation de données
 #----------------------------------------------------------
