@@ -171,8 +171,7 @@ L'interface graphique (GUI) est conçue pour pour caractériser des dispositifs 
 ### Structure
 
 - `main.py` : Script principal pour lancer l'interface graphique.
-- `Interface.py` : Contient la classe principale pour l'interface utilisateur, avec gestion de la connexion série à l'Arduino, l'envoi et la réception de données, et l'affichage des résultats.
-- `ImportExport.py` : Gère la fonctionnalité d'importation et d'exportation des données. Vous pouvez importer des fichiers `.txt` contenant des données pour les afficher ou exporter des données sous forme de fichiers texte.
+- `Interface.py` : Contient la classe principale pour l'interface utilisateur, avec gestion de la connexion série à l'Arduino, l'envoi et la réception de données, et l'affichage des résultats et gère aussi la fonctionnalité d'importation et d'exportation des données. Vous pouvez importer des fichiers `.txt` contenant des données pour les afficher ou exporter des données sous forme de fichiers texte.
 
 ### Détails sur l'interface graphique
 L'interface graphique se compose des sections suivantes :

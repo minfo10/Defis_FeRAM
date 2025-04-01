@@ -31,16 +31,16 @@ L'application est conçue pour être utilisée par des utilisateurs qui souhaite
 ## Menu
 
 L'application dispose d'un menu avec plusieurs options :
-    - Data : Pour importer ou exporter des fichiers .txt.
-    - Arduino : Pour réinitialiser l'Arduino (en cas de besoin).
-    - Help : Pour obtenir de l'aide et accéder à la documentation sur GitHub.
+   - Data : Pour importer ou exporter des fichiers .txt.
+   - Arduino : Pour réinitialiser l'Arduino (en cas de besoin).
+   - Help : Pour obtenir de l'aide et accéder à la documentation sur GitHub.
 
 ## Code et Conception
 
 Le code est structuré autour de la classe principale Interface qui gère l'interface graphique et la communication avec l'Arduino via le port série.
 
 Les principales fonctionnalités de l'application sont organisées en sections :
-    - Connection Section : Gère la connexion à l'Arduino.
-    - Write Section : Permet d'écrire des données dans la mémoire FeRAM.
-    - Read Section : Permet de lire les données stockées dans la mémoire FeRAM.
-    - Information Section : Affiche des informations sur la connexion et les étapes à suivre.
+   - Connection Section : Gère la connexion à l'Arduino.
+   - Write Section : Permet d'écrire des données dans la mémoire FeRAM.
+   - Read Section : Permet de lire les données stockées dans la mémoire FeRAM.
+   - Information Section : Affiche des informations sur la connexion et les étapes à suivre.
