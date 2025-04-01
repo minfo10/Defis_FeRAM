@@ -30,6 +30,7 @@ void zeroPara(int ligne);
 void unPara(int ligne);
 void zeroUnitaire();
 
+
 // *** Setup ***
 void setup() {
   // Set all pins as OUTPUT or INPUT
@@ -45,6 +46,7 @@ void setup() {
   pinMode(SC_SEL_UN, OUTPUT);
 
   pinMode(SC_OUT, INPUT);
+
 
   // Set all output pins to LOW initially
   digitalWrite(WB, LOW);
@@ -62,6 +64,7 @@ void setup() {
   affMenu(true);
 }
 
+
 // *** Boucle principale : Interface utilisateur ***
 void loop() {
   if (Serial.available() > 0) {
@@ -78,12 +81,16 @@ void loop() {
         break;
       case 3:
         Serial.println("// Export des données pas encore implémenté.");
+        
         break;
+      
       default:
         Serial.println("Option incorrecte. Veuillez réessayer.");
         break;
     }
+    
   }
+  
 }
 
 // *** Gestion des I/O ***
@@ -105,7 +112,9 @@ void affMenu(bool premAff) {
   Serial.println("1. Écriture");
   Serial.println("2. Lecture");
   Serial.println("3. Export des données contenues dans la mémoire vers un fichier .txt");
+  Serial.println("-------------------------------------------------------------------");
 }
+
 
 // *** Écriture dans la mémoire ***
 void ecriture() {
@@ -114,7 +123,7 @@ void ecriture() {
   String reponse; // Réponse de l'utilisateur
 
   // 1. Obtenir un entier à écrire
-  Serial.println("Entier non signé 8 bits (0 <= nb <= 255) à écrire :");
+  Serial.print("Entier non signé 8 bits (0 <= nb <= 255) à écrire :\n");
   while (!repValide) {
     while (!Serial.available())
       ; // Attendre une réponse
@@ -124,11 +133,15 @@ void ecriture() {
       repByte = stringToIntToBytes(reponse);
     }
   }
-
+  Serial.println(reponse);
+  Serial.println("---------");
   // 2. Obtenir la ligne et la colonne
   int ligne = obtenirPosition("Ligne ? (Entre 1 et 128)", 1, 128);
+  Serial.println(ligne);
+  Serial.println("---------");
   int colonne = obtenirPosition("Colonne ? (Entre 1 et 16)", 1, 16);
-
+  Serial.println(colonne);
+  Serial.println("---------\n");
   Serial.println("Écriture en cours...");
   unPara(ligne);  // Remet tous les bits de la ligne à 1
 
@@ -136,6 +149,7 @@ void ecriture() {
   scBL(repByte, colonne);  // Écriture de la colonne spécifiée avec les bits donnés
 
   Serial.println("Écriture réussie !");
+  Serial.println("-------------------------------------------------------------------");
   affMenu(false);
 }
 
@@ -143,9 +157,11 @@ void ecriture() {
 void lecture() {
   // Obtenir la position de la cellule à lire
   int ligne = obtenirPosition("Ligne ? (Entre 1 et 128)", 1, 128);
+  Serial.println("---------");
   int colonne = obtenirPosition("Colonne ? (Entre 1 et 16)", 1, 16);
+  Serial.print("---------\n");
 
-  Serial.println("Activer le write-back ? (1 = Oui, 0 = Non)");
+  Serial.println("Activer le write-back ? (1 = Oui, 0 = Non)\n");
   int writeBack = -1;
   while (writeBack < 0 || writeBack > 1) {
     while (!Serial.available())
@@ -226,7 +242,9 @@ int obtenirPosition(const char* message, int min, int max) {
   String reponse;
   bool repValide = false;
 
-  Serial.println(message);
+  Serial.print(message);
+  Serial.print(":\n");
+
   while (!repValide) {
     while (!Serial.available())
       ;
@@ -332,6 +350,7 @@ void scBL(uint8_t repByte, int colonne) {
 
   Serial.print("Sélection de la colonne : ");
   Serial.println(colonne);
+
 
   int startIndex = (colonne - 1) * 8;
 

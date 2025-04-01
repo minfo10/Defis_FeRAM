@@ -33,7 +33,7 @@ class Interface(tk.Tk):
         
         # Titre et icône de la fenêtre
         self.title('Défi FeRAM')
-        self.iconphoto(True, PhotoImage(os.path.abspath('icon.ico')))
+        # self.iconphoto(True, PhotoImage(os.path.abspath('../icon.ico')))
         self.geometry('580x420')
         self.configure(background='light gray')
 
