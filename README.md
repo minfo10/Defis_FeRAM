@@ -1,16 +1,8 @@
 # IPhy Challenges – Memories of the Future
 
 **Authors**: Melahoui Aymane, Nicolas Rabreau (2024–2025)
+
 **Partnership**: CEA Leti, as part of a year-long project at Grenoble-INP Phelma
-
----
-
-## 📖 Table of Contents
-
-* [⚙️ Prerequisites](#️-prerequisites)
-* [🚀 Installation & Usage](#-installation--usage)
-* [🔌 Arduino](#-arduino)
-* [🖥️ User Interface](#️-user-interface)
 
 ---
 
